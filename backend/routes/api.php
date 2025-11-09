@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\ReservationController;
 
 // Auth routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -19,6 +20,10 @@ Route::get('/services', [ServiceController::class, 'index']);
 Route::get('/services/{id}', [ServiceController::class, 'show']);
 Route::get('/services/category/{category}', [ServiceController::class, 'getByCategory']);
 
+// Public reservation routes
+Route::get('/reservations/available-slots', [ReservationController::class, 'getAvailableSlots']);
+Route::get('/reservations/stylist/{stylistId}', [ReservationController::class, 'getStylistReservations']);
+
 Route::middleware('auth:sanctum')->group(function () {
     // Auth
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -32,4 +37,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/services', [ServiceController::class, 'store']);
     Route::put('/services/{id}', [ServiceController::class, 'update']);
     Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
+
+    // Reservations
+    Route::get('/reservations', [ReservationController::class, 'index']);
+    Route::get('/reservations/{id}', [ReservationController::class, 'show']);
+    Route::post('/reservations', [ReservationController::class, 'store']);
+    Route::put('/reservations/{id}', [ReservationController::class, 'update']);
+    Route::post('/reservations/{id}/cancel', [ReservationController::class, 'cancel']);
 });
