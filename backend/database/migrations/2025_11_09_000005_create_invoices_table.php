@@ -36,7 +36,7 @@ return new class extends Migration
                 'sent',
                 'accepted',
                 'rejected'
-            ])->default('pending')->index();
+            ])->default('pending');
 
             $table->text('hacienda_message')->nullable();
             $table->string('response_code', 20)->nullable();

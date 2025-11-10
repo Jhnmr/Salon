@@ -46,10 +46,10 @@ return new class extends Migration
             ])->comment('Proveedor del pago');
 
             // IDs externos de proveedores
-            $table->string('stripe_payment_intent_id', 255)->nullable()->index();
-            $table->string('stripe_charge_id', 255)->nullable()->index();
+            $table->string('stripe_payment_intent_id', 255)->nullable();
+            $table->string('stripe_charge_id', 255)->nullable();
             $table->string('stripe_customer_id', 255)->nullable();
-            $table->string('paypal_order_id', 255)->nullable()->index();
+            $table->string('paypal_order_id', 255)->nullable();
             $table->string('paypal_capture_id', 255)->nullable();
 
             // Estado del pago
@@ -62,7 +62,7 @@ return new class extends Migration
                 'partially_refunded',
                 'disputed',
                 'cancelled'
-            ])->default('pending')->index();
+            ])->default('pending');
 
             // Comisiones y distribución (modelo de negocio)
             $table->decimal('commission_platform', 10, 2)->comment('Comisión para plataforma');

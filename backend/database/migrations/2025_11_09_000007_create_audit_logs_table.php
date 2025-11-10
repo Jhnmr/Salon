@@ -21,7 +21,7 @@ return new class extends Migration
             $table->json('new_data')->nullable()->comment('Datos nuevos');
             $table->ipAddress('ip_address')->nullable();
             $table->text('user_agent')->nullable();
-            $table->timestamp('created_at')->useCurrent()->index();
+            $table->timestamp('created_at')->useCurrent();
 
             // Constraints
             $table->foreign('user_id')
