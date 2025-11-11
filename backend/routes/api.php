@@ -11,9 +11,10 @@ use App\Http\Controllers\AvailabilityController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\DashboardController;
 
-// Auth routes
+// Auth routes (public)
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/auth/refresh', [AuthController::class, 'refresh']);
 
 // Public profile routes
 Route::get('/stylists', [ProfileController::class, 'getStylistProfiles']);
@@ -32,10 +33,11 @@ Route::get('/reservations/stylist/{stylistId}', [ReservationController::class, '
 Route::get('/availability/{stylistId}', [AvailabilityController::class, 'show']);
 Route::get('/availability/{stylistId}/{day}', [AvailabilityController::class, 'getByDay']);
 
-Route::middleware('auth:sanctum')->group(function () {
-    // Auth
+Route::middleware('jwt')->group(function () {
+    // Auth (protected)
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
+    Route::post('/auth/revoke-all', [AuthController::class, 'revokeAll']);
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'show']);
