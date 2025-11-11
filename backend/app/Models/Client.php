@@ -104,6 +104,34 @@ class Client extends Model
     }
 
     /**
+     * Get favorite stylists of this client
+     */
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    /**
+     * Get favorite stylists (with stylist data)
+     */
+    public function favoriteStylists()
+    {
+        return $this->belongsToMany(Stylist::class, 'favorites')
+            ->withTimestamps();
+    }
+
+    /**
+     * Check if a stylist is favorited by this client
+     *
+     * @param int $stylistId
+     * @return bool
+     */
+    public function hasFavorite(int $stylistId): bool
+    {
+        return $this->favorites()->where('stylist_id', $stylistId)->exists();
+    }
+
+    /**
      * Update total spent after a payment
      *
      * @param float $amount

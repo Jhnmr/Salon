@@ -151,6 +151,95 @@ class User extends Authenticatable
     }
 
     /**
+     * Get conversations where user participates
+     */
+    public function conversations()
+    {
+        return Conversation::where(function($q) {
+            $q->where('user1_id', $this->id)
+              ->orWhere('user2_id', $this->id);
+        })->orderBy('last_message_at', 'desc');
+    }
+
+    /**
+     * Get messages sent by this user
+     */
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    /**
+     * Get messages received by this user
+     */
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
+    }
+
+    /**
+     * Get all messages (sent and received)
+     */
+    public function messages()
+    {
+        return Message::where('sender_id', $this->id)
+            ->orWhere('receiver_id', $this->id)
+            ->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Get user's active subscription
+     */
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class)
+            ->whereIn('status', ['active', 'trialing'])
+            ->latest();
+    }
+
+    /**
+     * Get all subscriptions (including past)
+     */
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    /**
+     * Get user's saved payment methods
+     */
+    public function savedPaymentMethods()
+    {
+        return $this->hasMany(SavedPaymentMethod::class);
+    }
+
+    /**
+     * Get user's default payment method
+     */
+    public function defaultPaymentMethod()
+    {
+        return $this->hasOne(SavedPaymentMethod::class)
+            ->where('is_default', true);
+    }
+
+    /**
+     * Get posts liked by this user
+     */
+    public function likedPosts()
+    {
+        return $this->belongsToMany(Post::class, 'likes_posts')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get comments written by this user
+     */
+    public function comments()
+    {
+        return $this->hasMany(ComentarioPost::class);
+    }
+
+    /**
      * Check if user has a specific role
      *
      * @param string $roleName
