@@ -29,11 +29,10 @@ return new class extends Migration
                 ->on('users')
                 ->onDelete('set null');
 
-            // Índices para búsquedas comunes
+            // Índices para búsquedas comunes (created_at ya definido inline arriba)
             $table->index(['user_id', 'created_at']);
             $table->index(['table_name', 'record_id']);
             $table->index(['action']);
-            $table->index(['created_at']);
         });
     }
 

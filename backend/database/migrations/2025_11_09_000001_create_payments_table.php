@@ -102,12 +102,11 @@ return new class extends Migration
                 ->on('users')
                 ->onDelete('restrict');
 
-            // Índices para queries comunes
+            // Índices para queries comunes (algunos ya definidos inline arriba)
             $table->index(['codigo_transaccion']);
             $table->index(['user_id']);
             $table->index(['status', 'payment_date']);
             $table->index(['payment_provider', 'status']);
-            $table->index(['stripe_payment_intent_id']);
             $table->index(['created_at']);
         });
     }
