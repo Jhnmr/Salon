@@ -1,6 +1,32 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Tailwind v4 Theme Configuration */
+@theme {
+  --color-salon-yellow: #f4d03f;
+  --color-salon-yellow-light: #f9e076;
+  --color-salon-yellow-dark: #d4af37;
+  --color-salon-black: #0d0d0d;
+  --color-salon-black-light: #1a1a1a;
+  --color-salon-gray-dark: #2d2d2d;
+  --color-salon-gray-medium: #3d3d3d;
+  --color-salon-gray-light: #4d4d4d;
+  --color-salon-gray-text: #b0b0b0;
+
+  --color-success: #28a745;
+  --color-success-light: #34d058;
+  --color-danger: #dc3545;
+  --color-danger-light: #f85149;
+  --color-warning: #ffc107;
+  --color-warning-light: #ffca2c;
+
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-float: 0 4px 16px rgba(244, 208, 63, 0.2);
+  --shadow-glow: 0 0 20px rgba(244, 208, 63, 0.4);
+}
 
 /* Global Styles for Salon App - Dark Mode */
 @layer base {
