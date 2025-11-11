@@ -109,15 +109,114 @@ class Stylist extends Model
     }
 
     /**
-     * Get all services this stylist can perform.
+     * Get all services this stylist can perform through pivot table.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function services()
     {
-        // This would require a pivot table stylist_service
-        // For now, services are related through branch
-        return $this->hasManyThrough(Service::class, Branch::class, 'id', 'branch_id', 'branch_id', 'id');
+        return $this->belongsToMany(Service::class, 'stylist_services')
+            ->withPivot(['custom_price', 'custom_duration', 'is_available', 'notes'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Get stylist-service relationships (for custom pricing)
+     */
+    public function stylistServices()
+    {
+        return $this->hasMany(StylistService::class);
+    }
+
+    /**
+     * Get only available services for this stylist
+     */
+    public function availableServices()
+    {
+        return $this->belongsToMany(Service::class, 'stylist_services')
+            ->wherePivot('is_available', true)
+            ->withPivot(['custom_price', 'custom_duration', 'notes'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Get all portfolio posts from this stylist
+     */
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    /**
+     * Get published posts
+     */
+    public function publishedPosts()
+    {
+        return $this->hasMany(Post::class)
+            ->where('is_visible', true)
+            ->whereNotNull('published_at')
+            ->orderBy('published_at', 'desc');
+    }
+
+    /**
+     * Get portfolio posts specifically
+     */
+    public function portfolioPosts()
+    {
+        return $this->hasMany(Post::class)
+            ->where('is_portfolio', true)
+            ->where('is_visible', true)
+            ->orderBy('published_at', 'desc');
+    }
+
+    /**
+     * Get schedule blocks (vacations, time off, etc.)
+     */
+    public function scheduleBlocks()
+    {
+        return $this->hasMany(ScheduleBlock::class);
+    }
+
+    /**
+     * Get active schedule blocks
+     */
+    public function activeScheduleBlocks()
+    {
+        return $this->hasMany(ScheduleBlock::class)
+            ->where('end_datetime', '>=', now());
+    }
+
+    /**
+     * Get clients who favorited this stylist
+     */
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    /**
+     * Get clients who favorited this stylist (with client data)
+     */
+    public function favoritedByClients()
+    {
+        return $this->belongsToMany(Client::class, 'favorites')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get all reviews for this stylist
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Get all reservations for this stylist
+     */
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class, 'stylist_id', 'user_id');
     }
 
     /**
