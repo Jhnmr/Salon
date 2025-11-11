@@ -1,35 +1,59 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+/**
+ * SALON - Main Application Component
+ * Root component with routing and authentication
+ */
+
+import { useAuth } from './hooks/useAuth';
+import { Login } from './pages/Login';
+import { Home } from './pages/Home';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { user, loading } = useAuth();
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+          backgroundColor: '#0A0A0B',
+          color: '#FFFFFF',
+        }}
+      >
+        <div style={{ textAlign: 'center' }}>
+          <div
+            style={{
+              fontSize: '48px',
+              fontWeight: 'bold',
+              color: '#FFD700',
+              marginBottom: '16px',
+            }}
+          >
+            SALON
+          </div>
+          <div
+            style={{
+              fontSize: '14px',
+              color: '#9CA3AF',
+            }}
+          >
+            Cargando...
+          </div>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    );
+  }
+
+  // Show Login page if not authenticated
+  if (!user) {
+    return <Login />;
+  }
+
+  // Show Home page if authenticated
+  return <Home />;
 }
 
-export default App
+export default App;

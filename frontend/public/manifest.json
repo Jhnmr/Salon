@@ -1,0 +1,129 @@
+{
+  "name": "SALON - Beauty Services",
+  "short_name": "SALON",
+  "description": "Plataforma de gestión y reserva de servicios de belleza y salón",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0A0B",
+  "theme_color": "#FFD700",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/assets/logo-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/logo-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/logo-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/logo-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/logo-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/logo-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "beauty",
+    "lifestyle",
+    "business"
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/screenshot-mobile.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/assets/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nueva Cita",
+      "short_name": "Agendar",
+      "description": "Agendar una nueva cita",
+      "url": "/appointments/new",
+      "icons": [
+        {
+          "src": "/assets/icon-calendar.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Mis Citas",
+      "short_name": "Citas",
+      "description": "Ver mis citas programadas",
+      "url": "/appointments",
+      "icons": [
+        {
+          "src": "/assets/icon-list.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Servicios",
+      "short_name": "Servicios",
+      "description": "Explorar servicios disponibles",
+      "url": "/services",
+      "icons": [
+        {
+          "src": "/assets/icon-services.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "share_target": {
+    "action": "/share",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}
