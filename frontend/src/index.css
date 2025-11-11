@@ -1,3 +1,34 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Global Styles for Salon App - Dark Mode */
+@layer base {
+  body {
+    @apply bg-salon-black text-white font-sans antialiased;
+  }
+
+  * {
+    @apply border-salon-gray-medium;
+  }
+}
+
+/* Custom Utilities */
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-salon-yellow to-salon-yellow-light bg-clip-text text-transparent;
+  }
+
+  .glass-effect {
+    @apply bg-salon-black-light/80 backdrop-blur-lg;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
