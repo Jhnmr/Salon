@@ -11,19 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('services', function (Blueprint $table) {
+        Schema::create('service_categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sucursal_id')->constrained('branches')->onDelete('cascade');
-
-            $table->string('nombre', 255);
+            $table->string('nombre', 100);
+            $table->string('slug', 100)->unique();
             $table->text('descripcion')->nullable();
-            $table->decimal('precio', 10, 2);
-            $table->unsignedInteger('duracion_minutos');
+            $table->string('icono', 50)->nullable();
+            $table->string('color', 7)->default('#000000'); // Hex color
 
+            $table->unsignedInteger('orden')->default(0);
             $table->boolean('activo')->default(true);
+
             $table->timestamps();
 
-            $table->index(['sucursal_id', 'activo']);
+            // Indexes
+            $table->index(['activo', 'orden']);
         });
     }
 
@@ -32,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('services');
+        Schema::dropIfExists('service_categories');
     }
 };

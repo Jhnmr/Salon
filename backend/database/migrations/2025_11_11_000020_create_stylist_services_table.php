@@ -11,19 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('availabilities', function (Blueprint $table) {
+        Schema::create('stylist_services', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('servicio_id')->constrained('services')->onDelete('cascade');
             $table->foreignId('estilista_id')->constrained('stylists')->onDelete('cascade');
 
-            $table->enum('dia_semana', ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo']);
-            $table->time('hora_inicio');
-            $table->time('hora_fin');
-            $table->unsignedInteger('duracion_slot')->default(30)->comment('Duración de cada slot en minutos');
+            $table->decimal('precio_personalizado', 10, 2)->nullable();
+            $table->unsignedInteger('duracion_personalizada')->nullable(); // In minutes
 
             $table->boolean('activo')->default(true);
+
             $table->timestamps();
 
-            $table->index(['estilista_id', 'dia_semana', 'activo']);
+            // Ensure a stylist can only be assigned to a service once
+            $table->unique(['servicio_id', 'estilista_id']);
+            $table->index(['estilista_id', 'activo']);
         });
     }
 
@@ -32,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('availabilities');
+        Schema::dropIfExists('stylist_services');
     }
 };

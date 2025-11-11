@@ -14,13 +14,14 @@ return new class extends Migration
         Schema::create('profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('phone')->nullable();
+
             $table->text('bio')->nullable();
-            $table->string('avatar_url')->nullable();
-            $table->string('specialization')->nullable(); // For stylists
-            $table->integer('experience_years')->nullable(); // For stylists
-            $table->decimal('rating', 3, 2)->default(0); // For stylists
+            $table->string('foto_perfil', 500)->nullable();
+            $table->json('preferences')->nullable();
+
             $table->timestamps();
+
+            $table->index('user_id');
         });
     }
 

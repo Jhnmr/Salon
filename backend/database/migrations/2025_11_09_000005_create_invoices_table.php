@@ -60,9 +60,8 @@ return new class extends Migration
                 ->on('branches')
                 ->onDelete('restrict');
 
-            // Índices
+            // Índices (hacienda_status ya definido inline arriba)
             $table->index(['invoice_number']);
-            $table->index(['hacienda_status']);
             $table->index(['branch_id', 'issued_at']);
             $table->index(['created_at']);
         });

@@ -13,14 +13,26 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('type');
-            $table->string('title');
-            $table->text('message');
-            $table->foreignId('reservation_id')->nullable()->constrained('reservations')->onDelete('cascade');
-            $table->boolean('is_read')->default(false);
-            $table->timestamp('sent_at')->nullable();
+            $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
+            $table->unsignedBigInteger('relacionado_id')->nullable()->comment('ID genérico relacionado');
+
+            $table->enum('tipo', ['cita', 'pago', 'mensaje', 'sistema', 'promocion', 'resena']);
+            $table->string('titulo', 255);
+            $table->text('mensaje');
+            $table->string('icono', 100)->nullable();
+            $table->string('url_destino', 500)->nullable();
+            $table->json('metadata')->nullable();
+
+            $table->boolean('leida')->default(false);
+            $table->timestamp('leida_en')->nullable();
+            $table->boolean('push_enviado')->default(false);
+            $table->boolean('email_enviado')->default(false);
+            $table->boolean('sms_enviado')->default(false);
+
             $table->timestamps();
+
+            $table->index(['usuario_id', 'leida', 'created_at']);
+            $table->index(['tipo']);
         });
     }
 

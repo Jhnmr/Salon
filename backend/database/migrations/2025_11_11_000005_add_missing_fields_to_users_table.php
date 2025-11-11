@@ -26,9 +26,8 @@ return new class extends Migration
             $table->string('timezone', 50)->default('America/Costa_Rica')->after('country');
             $table->string('currency', 3)->default('CRC')->after('timezone')->comment('ISO 4217');
 
-            // Email verification
-            $table->timestamp('email_verified_at')->nullable()->after('email');
-            $table->string('email_verification_token', 100)->nullable()->after('email_verified_at');
+            // Email verification (email_verified_at already exists)
+            $table->string('email_verification_token', 100)->nullable()->after('email');
 
             // Security
             $table->unsignedTinyInteger('failed_login_attempts')->default(0)->after('password');
@@ -60,7 +59,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn([
                 'phone', 'apellidos', 'theme', 'color_palette', 'language_preference',
-                'country', 'timezone', 'currency', 'email_verified_at', 'email_verification_token',
+                'country', 'timezone', 'currency', 'email_verification_token',
                 'failed_login_attempts', 'locked_until', 'provider', 'provider_id',
                 'two_factor_enabled', 'two_factor_secret', 'deleted_at'
             ]);
