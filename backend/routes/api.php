@@ -10,6 +10,11 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AvailabilityController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\BranchController;
+use App\Http\Controllers\StylistController;
 
 // Auth routes (public)
 Route::post('/register', [AuthController::class, 'register']);
@@ -32,6 +37,19 @@ Route::get('/reservations/stylist/{stylistId}', [ReservationController::class, '
 // Public availability routes
 Route::get('/availability/{stylistId}', [AvailabilityController::class, 'show']);
 Route::get('/availability/{stylistId}/{day}', [AvailabilityController::class, 'getByDay']);
+
+// Public branch routes
+Route::get('/branches', [BranchController::class, 'index']);
+Route::get('/branches/{id}', [BranchController::class, 'show']);
+Route::get('/branches/{id}/stats', [BranchController::class, 'stats']);
+
+// Public stylist routes
+Route::get('/stylists', [StylistController::class, 'index']);
+Route::get('/stylists/{id}', [StylistController::class, 'show']);
+
+// Payment webhooks (public - no auth for webhooks)
+Route::post('/payments/webhook/stripe', [PaymentController::class, 'stripeWebhook']);
+Route::post('/payments/webhook/paypal', [PaymentController::class, 'paypalWebhook']);
 
 Route::middleware('jwt')->group(function () {
     // Auth (protected)
@@ -83,4 +101,42 @@ Route::middleware('jwt')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/dashboard/stats', [DashboardController::class, 'quickStats']);
+
+    // Payments
+    Route::get('/payments', [PaymentController::class, 'index']);
+    Route::get('/payments/{id}', [PaymentController::class, 'show']);
+    Route::post('/payments', [PaymentController::class, 'store']);
+    Route::post('/payments/{id}/confirm', [PaymentController::class, 'confirm']);
+    Route::post('/payments/{id}/refund', [PaymentController::class, 'refund']);
+    Route::get('/payments/statistics', [PaymentController::class, 'statistics']);
+
+    // Invoices
+    Route::get('/invoices', [InvoiceController::class, 'index']);
+    Route::get('/invoices/{id}', [InvoiceController::class, 'show']);
+    Route::post('/invoices', [InvoiceController::class, 'store']);
+    Route::post('/invoices/{id}/send', [InvoiceController::class, 'send']);
+    Route::get('/invoices/{id}/download', [InvoiceController::class, 'download']);
+    Route::post('/invoices/{id}/cancel', [InvoiceController::class, 'cancel']);
+    Route::post('/invoices/{id}/resend', [InvoiceController::class, 'resend']);
+    Route::get('/invoices/statistics', [InvoiceController::class, 'stats']);
+
+    // Audit Logs (admin only)
+    Route::get('/audit-logs', [AuditLogController::class, 'index']);
+    Route::get('/audit-logs/mine', [AuditLogController::class, 'mine']);
+    Route::get('/audit-logs/{id}', [AuditLogController::class, 'show']);
+    Route::get('/audit-logs/record/{tableName}/{recordId}', [AuditLogController::class, 'recordHistory']);
+    Route::get('/audit-logs/statistics', [AuditLogController::class, 'stats']);
+    Route::delete('/audit-logs/cleanup', [AuditLogController::class, 'cleanup']);
+
+    // Branches (admin management)
+    Route::post('/branches', [BranchController::class, 'store']);
+    Route::put('/branches/{id}', [BranchController::class, 'update']);
+    Route::delete('/branches/{id}', [BranchController::class, 'destroy']);
+    Route::post('/branches/{id}/activate', [BranchController::class, 'activate']);
+    Route::post('/branches/{id}/deactivate', [BranchController::class, 'deactivate']);
+    Route::post('/branches/{id}/verify', [BranchController::class, 'verify']);
+
+    // Stylists (admin management)
+    Route::post('/stylists', [StylistController::class, 'store']);
+    Route::put('/stylists/{id}', [StylistController::class, 'update']);
 });

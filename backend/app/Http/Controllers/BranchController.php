@@ -6,6 +6,8 @@ use App\Models\Branch;
 use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
@@ -221,9 +223,136 @@ class BranchController extends Controller
     }
 
     /**
-     * Get branch statistics
+     * Activate branch
+     *
+     * POST /branches/{id}/activate
      */
-    public function stats(int $id)
+    public function activate(int $id, Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user->isAdmin()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Only administrators can activate branches'
+            ], 403);
+        }
+
+        try {
+            $branch = Branch::findOrFail($id);
+            $oldData = $branch->toArray();
+
+            $branch->status = Branch::STATUS_ACTIVE;
+            $branch->save();
+
+            AuditLog::logUpdate('branches', $branch->id, $oldData, $branch->toArray());
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Branch activated successfully',
+                'data' => $branch
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error activating branch: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to activate branch',
+                'errors' => ['server' => [$e->getMessage()]]
+            ], 500);
+        }
+    }
+
+    /**
+     * Deactivate branch
+     *
+     * POST /branches/{id}/deactivate
+     */
+    public function deactivate(int $id, Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user->isAdmin()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Only administrators can deactivate branches'
+            ], 403);
+        }
+
+        try {
+            $branch = Branch::findOrFail($id);
+            $oldData = $branch->toArray();
+
+            $branch->status = Branch::STATUS_INACTIVE;
+            $branch->save();
+
+            AuditLog::logUpdate('branches', $branch->id, $oldData, $branch->toArray());
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Branch deactivated successfully',
+                'data' => $branch
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error deactivating branch: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to deactivate branch',
+                'errors' => ['server' => [$e->getMessage()]]
+            ], 500);
+        }
+    }
+
+    /**
+     * Verify branch
+     *
+     * POST /branches/{id}/verify
+     */
+    public function verify(int $id, Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user->isSuperAdmin()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Only super administrators can verify branches'
+            ], 403);
+        }
+
+        try {
+            $branch = Branch::findOrFail($id);
+            $oldData = $branch->toArray();
+
+            $branch->verified = true;
+            $branch->verified_at = now();
+            $branch->save();
+
+            AuditLog::logUpdate('branches', $branch->id, $oldData, $branch->toArray());
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Branch verified successfully',
+                'data' => $branch
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error verifying branch: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to verify branch',
+                'errors' => ['server' => [$e->getMessage()]]
+            ], 500);
+        }
+    }
+
+    /**
+     * Get branch statistics (Enhanced)
+     */
+    public function stats(int $id, Request $request)
     {
         $branch = Branch::find($id);
 
@@ -234,19 +363,54 @@ class BranchController extends Controller
             ], 404);
         }
 
-        $stats = [
-            'total_stylists' => $branch->stylists()->count(),
-            'active_stylists' => $branch->stylists()->where('is_active', true)->count(),
-            'total_services' => $branch->services()->count(),
-            'total_payments' => $branch->payments()->count(),
-            'total_revenue' => $branch->payments()->where('status', 'completed')->sum('amount_total'),
-            'average_rating' => $branch->average_rating,
-            'total_reviews' => $branch->total_reviews,
-        ];
+        try {
+            $stats = [
+                'basic' => [
+                    'total_stylists' => $branch->stylists()->count(),
+                    'active_stylists' => $branch->stylists()->where('is_active', true)->count(),
+                    'total_services' => $branch->services()->count(),
+                    'active_services' => $branch->services()->where('is_active', true)->count(),
+                    'average_rating' => $branch->average_rating ?? 0,
+                    'total_reviews' => $branch->total_reviews ?? 0,
+                ],
+                'financial' => [
+                    'total_payments' => $branch->payments()->count(),
+                    'completed_payments' => $branch->payments()->where('status', 'completed')->count(),
+                    'total_revenue' => $branch->payments()->where('status', 'completed')->sum('amount_total'),
+                    'total_commission' => $branch->payments()->where('status', 'completed')->sum('amount_branch'),
+                    'pending_revenue' => $branch->payments()->where('status', 'pending')->sum('amount_total'),
+                ],
+                'reservations' => [
+                    'total' => $branch->reservations()->count(),
+                    'confirmed' => $branch->reservations()->where('status', 'confirmed')->count(),
+                    'completed' => $branch->reservations()->where('status', 'completed')->count(),
+                    'cancelled' => $branch->reservations()->where('status', 'cancelled')->count(),
+                ],
+                'monthly_revenue' => $branch->payments()
+                    ->where('status', 'completed')
+                    ->whereYear('created_at', date('Y'))
+                    ->select(
+                        DB::raw('MONTH(created_at) as month'),
+                        DB::raw('SUM(amount_total) as total')
+                    )
+                    ->groupBy('month')
+                    ->orderBy('month')
+                    ->pluck('total', 'month'),
+            ];
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $stats,
-        ], 200);
+            return response()->json([
+                'status' => 'success',
+                'data' => $stats,
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error getting branch statistics: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to retrieve statistics',
+                'errors' => ['server' => [$e->getMessage()]]
+            ], 500);
+        }
     }
 }
