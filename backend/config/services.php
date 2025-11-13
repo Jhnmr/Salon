@@ -35,4 +35,24 @@ return [
         ],
     ],
 
+    'stripe' => [
+        'public' => env('STRIPE_PUBLIC_KEY', ''),
+        'secret' => env('STRIPE_SECRET_KEY', ''),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET', ''),
+    ],
+
+    'google' => [
+        'maps_key' => env('GOOGLE_MAPS_API_KEY', ''),
+    ],
+
+    'firebase' => [
+        'project_id' => env('FIREBASE_PROJECT_ID', ''),
+        'api_key' => env('FIREBASE_API_KEY', ''),
+        'service_account' => env('FIREBASE_SERVICE_ACCOUNT_JSON', ''),
+    ],
+
+    'sendgrid' => [
+        'key' => env('SENDGRID_API_KEY', ''),
+    ],
+
 ];

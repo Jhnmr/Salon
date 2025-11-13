@@ -45,6 +45,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     });
 
+    // Stripe Webhook (Must be public, no auth)
+    Route::post('/webhooks/stripe', [\App\Http\Controllers\StripePaymentController::class, 'webhook']);
+
     // Public Profile Routes
     Route::prefix('profiles')->group(function () {
         Route::get('/stylists', [ProfileController::class, 'getStylistProfiles']);
@@ -293,6 +296,13 @@ Route::prefix('v1')->middleware('jwt')->group(function () {
         Route::post('/process', [PaymentController::class, 'process']);
         Route::post('/{id}/refund', [PaymentController::class, 'refund']);
         Route::get('/methods', [PaymentController::class, 'paymentMethods']);
+
+        // Stripe Payment Routes
+        Route::prefix('stripe')->group(function () {
+            Route::post('/create-intent', [\App\Http\Controllers\StripePaymentController::class, 'createPaymentIntent']);
+            Route::post('/confirm', [\App\Http\Controllers\StripePaymentController::class, 'confirmPayment']);
+            Route::get('/public-key', [\App\Http\Controllers\StripePaymentController::class, 'getPublicKey']);
+        });
     });
 
     // ========================================================================
