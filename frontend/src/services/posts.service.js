@@ -17,12 +17,8 @@ import { get, post, put, del, upload } from './api';
  * @returns {Promise<Object>} Posts list with pagination
  */
 export const getPosts = async (filters = {}) => {
-  try {
-    const response = await get('/posts', { params: filters });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/posts', { params: filters });
+  return response.data;
 };
 
 /**
@@ -31,12 +27,8 @@ export const getPosts = async (filters = {}) => {
  * @returns {Promise<Object>} Post data with images and comments
  */
 export const getPost = async (id) => {
-  try {
-    const response = await get(`/posts/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get(`/posts/${id}`);
+  return response.data;
 };
 
 /**
@@ -50,30 +42,26 @@ export const getPost = async (id) => {
  * @returns {Promise<Object>} Created post
  */
 export const createPost = async (data, images = [], onUploadProgress) => {
-  try {
-    const formData = new FormData();
+  const formData = new FormData();
 
-    // Add post data
-    formData.append('title', data.title);
-    formData.append('description', data.description);
+  // Add post data
+  formData.append('title', data.title);
+  formData.append('description', data.description);
 
-    // Add tags
-    if (data.tags && data.tags.length > 0) {
-      data.tags.forEach((tag, index) => {
-        formData.append(`tags[${index}]`, tag);
-      });
-    }
-
-    // Add images
-    images.forEach((image, index) => {
-      formData.append(`images[${index}]`, image);
+  // Add tags
+  if (data.tags && data.tags.length > 0) {
+    data.tags.forEach((tag, index) => {
+      formData.append(`tags[${index}]`, tag);
     });
-
-    const response = await upload('/posts', formData, onUploadProgress);
-    return response.data;
-  } catch (error) {
-    throw error;
   }
+
+  // Add images
+  images.forEach((image, index) => {
+    formData.append(`images[${index}]`, image);
+  });
+
+  const response = await upload('/posts', formData, onUploadProgress);
+  return response.data;
 };
 
 /**
@@ -83,12 +71,8 @@ export const createPost = async (data, images = [], onUploadProgress) => {
  * @returns {Promise<Object>} Updated post
  */
 export const updatePost = async (id, data) => {
-  try {
-    const response = await put(`/posts/${id}`, data);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await put(`/posts/${id}`, data);
+  return response.data;
 };
 
 /**
@@ -97,11 +81,7 @@ export const updatePost = async (id, data) => {
  * @returns {Promise<void>}
  */
 export const deletePost = async (id) => {
-  try {
-    await del(`/posts/${id}`);
-  } catch (error) {
-    throw error;
-  }
+  await del(`/posts/${id}`);
 };
 
 /**
@@ -110,12 +90,8 @@ export const deletePost = async (id) => {
  * @returns {Promise<Object>} Updated post with like status
  */
 export const likePost = async (id) => {
-  try {
-    const response = await post(`/posts/${id}/like`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await post(`/posts/${id}/like`);
+  return response.data;
 };
 
 /**
@@ -124,12 +100,8 @@ export const likePost = async (id) => {
  * @returns {Promise<Object>} Updated post with like status
  */
 export const unlikePost = async (id) => {
-  try {
-    const response = await del(`/posts/${id}/like`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await del(`/posts/${id}/like`);
+  return response.data;
 };
 
 /**
@@ -140,14 +112,10 @@ export const unlikePost = async (id) => {
  * @returns {Promise<Object>} Comments with pagination
  */
 export const getPostComments = async (id, page = 1, perPage = 20) => {
-  try {
-    const response = await get(`/posts/${id}/comments`, {
-      params: { page, per_page: perPage },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get(`/posts/${id}/comments`, {
+    params: { page, per_page: perPage },
+  });
+  return response.data;
 };
 
 /**
@@ -157,12 +125,8 @@ export const getPostComments = async (id, page = 1, perPage = 20) => {
  * @returns {Promise<Object>} Created comment
  */
 export const commentOnPost = async (id, comment) => {
-  try {
-    const response = await post(`/posts/${id}/comments`, { comment });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await post(`/posts/${id}/comments`, { comment });
+  return response.data;
 };
 
 /**
@@ -172,11 +136,7 @@ export const commentOnPost = async (id, comment) => {
  * @returns {Promise<void>}
  */
 export const deleteComment = async (postId, commentId) => {
-  try {
-    await del(`/posts/${postId}/comments/${commentId}`);
-  } catch (error) {
-    throw error;
-  }
+  await del(`/posts/${postId}/comments/${commentId}`);
 };
 
 /**
@@ -185,14 +145,10 @@ export const deleteComment = async (postId, commentId) => {
  * @returns {Promise<Array>} Trending posts
  */
 export const getTrendingPosts = async (limit = 10) => {
-  try {
-    const response = await get('/posts/trending', {
-      params: { limit },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/posts/trending', {
+    params: { limit },
+  });
+  return response.data;
 };
 
 /**
@@ -202,14 +158,10 @@ export const getTrendingPosts = async (limit = 10) => {
  * @returns {Promise<Object>} Feed posts with pagination
  */
 export const getFeedPosts = async (page = 1, perPage = 20) => {
-  try {
-    const response = await get('/posts/feed', {
-      params: { page, per_page: perPage },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/posts/feed', {
+    params: { page, per_page: perPage },
+  });
+  return response.data;
 };
 
 /**
@@ -219,14 +171,10 @@ export const getFeedPosts = async (page = 1, perPage = 20) => {
  * @returns {Promise<Object>} Search results
  */
 export const searchPosts = async (query, filters = {}) => {
-  try {
-    const response = await get('/posts/search', {
-      params: { q: query, ...filters },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/posts/search', {
+    params: { q: query, ...filters },
+  });
+  return response.data;
 };
 
 /**
@@ -236,17 +184,13 @@ export const searchPosts = async (query, filters = {}) => {
  * @returns {Promise<Object>} Updated post
  */
 export const addPostImage = async (id, image) => {
-  try {
-    const formData = new FormData();
-    formData.append('image', image);
+  const formData = new FormData();
+  formData.append('image', image);
 
-    const response = await post(`/posts/${id}/images`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await post(`/posts/${id}/images`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
 };
 
 /**
@@ -256,11 +200,7 @@ export const addPostImage = async (id, image) => {
  * @returns {Promise<void>}
  */
 export const deletePostImage = async (postId, imageId) => {
-  try {
-    await del(`/posts/${postId}/images/${imageId}`);
-  } catch (error) {
-    throw error;
-  }
+  await del(`/posts/${postId}/images/${imageId}`);
 };
 
 export default {

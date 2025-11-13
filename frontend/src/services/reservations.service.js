@@ -18,12 +18,8 @@ import { get, post, put, patch, del } from './api';
  * @returns {Promise<Object>} Reservations list with pagination
  */
 export const getReservations = async (filters = {}) => {
-  try {
-    const response = await get('/reservations', { params: filters });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/reservations', { params: filters });
+  return response.data;
 };
 
 /**
@@ -32,12 +28,8 @@ export const getReservations = async (filters = {}) => {
  * @returns {Promise<Object>} Reservation data
  */
 export const getReservation = async (id) => {
-  try {
-    const response = await get(`/reservations/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get(`/reservations/${id}`);
+  return response.data;
 };
 
 /**
@@ -50,12 +42,8 @@ export const getReservation = async (id) => {
  * @returns {Promise<Object>} Created reservation
  */
 export const createReservation = async (data) => {
-  try {
-    const response = await post('/reservations', data);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await post('/reservations', data);
+  return response.data;
 };
 
 /**
@@ -65,12 +53,8 @@ export const createReservation = async (data) => {
  * @returns {Promise<Object>} Updated reservation
  */
 export const updateReservation = async (id, data) => {
-  try {
-    const response = await put(`/reservations/${id}`, data);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await put(`/reservations/${id}`, data);
+  return response.data;
 };
 
 /**
@@ -80,12 +64,8 @@ export const updateReservation = async (id, data) => {
  * @returns {Promise<Object>} Cancelled reservation
  */
 export const cancelReservation = async (id, reason = '') => {
-  try {
-    const response = await patch(`/reservations/${id}/cancel`, { reason });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await patch(`/reservations/${id}/cancel`, { reason });
+  return response.data;
 };
 
 /**
@@ -94,12 +74,8 @@ export const cancelReservation = async (id, reason = '') => {
  * @returns {Promise<Object>} Confirmed reservation
  */
 export const confirmReservation = async (id) => {
-  try {
-    const response = await patch(`/reservations/${id}/confirm`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await patch(`/reservations/${id}/confirm`);
+  return response.data;
 };
 
 /**
@@ -108,12 +84,8 @@ export const confirmReservation = async (id) => {
  * @returns {Promise<Object>} Completed reservation
  */
 export const completeReservation = async (id) => {
-  try {
-    const response = await patch(`/reservations/${id}/complete`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await patch(`/reservations/${id}/complete`);
+  return response.data;
 };
 
 /**
@@ -123,14 +95,10 @@ export const completeReservation = async (id) => {
  * @returns {Promise<Object>} Rescheduled reservation
  */
 export const rescheduleReservation = async (id, scheduledAt) => {
-  try {
-    const response = await patch(`/reservations/${id}/reschedule`, {
-      scheduled_at: scheduledAt,
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await patch(`/reservations/${id}/reschedule`, {
+    scheduled_at: scheduledAt,
+  });
+  return response.data;
 };
 
 /**
@@ -141,18 +109,14 @@ export const rescheduleReservation = async (id, scheduledAt) => {
  * @returns {Promise<Object>} Available time slots
  */
 export const checkAvailability = async (stylistId, serviceId, date) => {
-  try {
-    const response = await get('/reservations/availability', {
-      params: {
-        stylist_id: stylistId,
-        service_id: serviceId,
-        date,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/reservations/availability', {
+    params: {
+      stylist_id: stylistId,
+      service_id: serviceId,
+      date,
+    },
+  });
+  return response.data;
 };
 
 /**
@@ -161,14 +125,10 @@ export const checkAvailability = async (stylistId, serviceId, date) => {
  * @returns {Promise<Object>} Upcoming reservations
  */
 export const getUpcomingReservations = async (limit = 5) => {
-  try {
-    const response = await get('/reservations/upcoming', {
-      params: { limit },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/reservations/upcoming', {
+    params: { limit },
+  });
+  return response.data;
 };
 
 /**
@@ -178,14 +138,10 @@ export const getUpcomingReservations = async (limit = 5) => {
  * @returns {Promise<Object>} Past reservations with pagination
  */
 export const getPastReservations = async (page = 1, perPage = 10) => {
-  try {
-    const response = await get('/reservations/past', {
-      params: { page, per_page: perPage },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/reservations/past', {
+    params: { page, per_page: perPage },
+  });
+  return response.data;
 };
 
 /**
@@ -194,11 +150,7 @@ export const getPastReservations = async (page = 1, perPage = 10) => {
  * @returns {Promise<void>}
  */
 export const deleteReservation = async (id) => {
-  try {
-    await del(`/reservations/${id}`);
-  } catch (error) {
-    throw error;
-  }
+  await del(`/reservations/${id}`);
 };
 
 export default {

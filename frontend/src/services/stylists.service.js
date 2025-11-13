@@ -20,12 +20,8 @@ import { get, post, put, del } from './api';
  * @returns {Promise<Object>} Stylists list with pagination
  */
 export const getStylists = async (filters = {}) => {
-  try {
-    const response = await get('/stylists', { params: filters });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/stylists', { params: filters });
+  return response.data;
 };
 
 /**
@@ -34,12 +30,8 @@ export const getStylists = async (filters = {}) => {
  * @returns {Promise<Object>} Stylist data with full profile
  */
 export const getStylist = async (id) => {
-  try {
-    const response = await get(`/stylists/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get(`/stylists/${id}`);
+  return response.data;
 };
 
 /**
@@ -50,14 +42,10 @@ export const getStylist = async (id) => {
  * @returns {Promise<Object>} Reviews with pagination
  */
 export const getStylistReviews = async (id, page = 1, perPage = 10) => {
-  try {
-    const response = await get(`/stylists/${id}/reviews`, {
-      params: { page, per_page: perPage },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get(`/stylists/${id}/reviews`, {
+    params: { page, per_page: perPage },
+  });
+  return response.data;
 };
 
 /**
@@ -68,14 +56,10 @@ export const getStylistReviews = async (id, page = 1, perPage = 10) => {
  * @returns {Promise<Object>} Portfolio posts with pagination
  */
 export const getStylistPosts = async (id, page = 1, perPage = 12) => {
-  try {
-    const response = await get(`/stylists/${id}/posts`, {
-      params: { page, per_page: perPage },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get(`/stylists/${id}/posts`, {
+    params: { page, per_page: perPage },
+  });
+  return response.data;
 };
 
 /**
@@ -86,15 +70,11 @@ export const getStylistPosts = async (id, page = 1, perPage = 12) => {
  * @returns {Promise<Object>} Available time slots
  */
 export const getStylistAvailability = async (id, date, serviceId = null) => {
-  try {
-    const params = { date };
-    if (serviceId) params.service_id = serviceId;
+  const params = { date };
+  if (serviceId) params.service_id = serviceId;
 
-    const response = await get(`/stylists/${id}/availability`, { params });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get(`/stylists/${id}/availability`, { params });
+  return response.data;
 };
 
 /**
@@ -105,14 +85,10 @@ export const getStylistAvailability = async (id, date, serviceId = null) => {
  * @returns {Promise<Object>} Stylist schedule
  */
 export const getStylistSchedule = async (id, startDate, endDate) => {
-  try {
-    const response = await get(`/stylists/${id}/schedule`, {
-      params: { start_date: startDate, end_date: endDate },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get(`/stylists/${id}/schedule`, {
+    params: { start_date: startDate, end_date: endDate },
+  });
+  return response.data;
 };
 
 /**
@@ -121,12 +97,8 @@ export const getStylistSchedule = async (id, startDate, endDate) => {
  * @returns {Promise<Object>} Stylist statistics
  */
 export const getStylistStats = async (id) => {
-  try {
-    const response = await get(`/stylists/${id}/stats`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get(`/stylists/${id}/stats`);
+  return response.data;
 };
 
 /**
@@ -136,14 +108,10 @@ export const getStylistStats = async (id) => {
  * @returns {Promise<Object>} Search results
  */
 export const searchStylists = async (query, filters = {}) => {
-  try {
-    const response = await get('/stylists/search', {
-      params: { q: query, ...filters },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/stylists/search', {
+    params: { q: query, ...filters },
+  });
+  return response.data;
 };
 
 /**
@@ -152,14 +120,10 @@ export const searchStylists = async (query, filters = {}) => {
  * @returns {Promise<Array>} Featured stylists
  */
 export const getFeaturedStylists = async (limit = 6) => {
-  try {
-    const response = await get('/stylists/featured', {
-      params: { limit },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/stylists/featured', {
+    params: { limit },
+  });
+  return response.data;
 };
 
 /**
@@ -169,12 +133,8 @@ export const getFeaturedStylists = async (limit = 6) => {
  * @returns {Promise<Object>} Updated stylist profile
  */
 export const updateStylistProfile = async (id, data) => {
-  try {
-    const response = await put(`/stylists/${id}`, data);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await put(`/stylists/${id}`, data);
+  return response.data;
 };
 
 /**
@@ -184,12 +144,8 @@ export const updateStylistProfile = async (id, data) => {
  * @returns {Promise<Object>} Updated working hours
  */
 export const updateWorkingHours = async (id, workingHours) => {
-  try {
-    const response = await put(`/stylists/${id}/working-hours`, workingHours);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await put(`/stylists/${id}/working-hours`, workingHours);
+  return response.data;
 };
 
 /**
@@ -199,12 +155,8 @@ export const updateWorkingHours = async (id, workingHours) => {
  * @returns {Promise<Object>} Updated services list
  */
 export const addStylistService = async (id, serviceId) => {
-  try {
-    const response = await post(`/stylists/${id}/services`, { service_id: serviceId });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await post(`/stylists/${id}/services`, { service_id: serviceId });
+  return response.data;
 };
 
 /**
@@ -214,11 +166,7 @@ export const addStylistService = async (id, serviceId) => {
  * @returns {Promise<void>}
  */
 export const removeStylistService = async (id, serviceId) => {
-  try {
-    await del(`/stylists/${id}/services/${serviceId}`);
-  } catch (error) {
-    throw error;
-  }
+  await del(`/stylists/${id}/services/${serviceId}`);
 };
 
 /**
@@ -228,17 +176,13 @@ export const removeStylistService = async (id, serviceId) => {
  * @returns {Promise<Object>} Updated stylist with new photo URL
  */
 export const uploadStylistPhoto = async (id, photo) => {
-  try {
-    const formData = new FormData();
-    formData.append('photo', photo);
+  const formData = new FormData();
+  formData.append('photo', photo);
 
-    const response = await post(`/stylists/${id}/photo`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await post(`/stylists/${id}/photo`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
 };
 
 export default {
