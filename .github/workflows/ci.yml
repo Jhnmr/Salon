@@ -54,8 +54,38 @@ jobs:
           coverage: xdebug
           tools: composer:v2
 
+      - name: Copy environment file
+        working-directory: ./backend
+        run: |
+          if [ -f .env.example ]; then
+            cp .env.example .env
+          else
+            cat > .env <<'EOT'
+          APP_NAME=Salon
+          APP_ENV=testing
+          APP_KEY=
+          APP_DEBUG=true
+          APP_URL=http://localhost
+
+          DB_CONNECTION=pgsql
+          DB_HOST=localhost
+          DB_PORT=5432
+          DB_DATABASE=salon_test
+          DB_USERNAME=salon
+          DB_PASSWORD=secret
+
+          REDIS_HOST=localhost
+          REDIS_PORT=6379
+
+          CACHE_DRIVER=redis
+          QUEUE_CONNECTION=redis
+          SESSION_DRIVER=redis
+          EOT
+          fi
+
       - name: Get Composer cache directory
         id: composer-cache
+        working-directory: ./backend
         run: |
           echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
@@ -70,10 +100,6 @@ jobs:
       - name: Install Composer dependencies
         working-directory: ./backend
         run: composer install --prefer-dist --no-interaction --no-progress
-
-      - name: Copy environment file
-        working-directory: ./backend
-        run: cp .env.example .env || echo "No .env.example found, creating .env"
 
       - name: Generate application key
         working-directory: ./backend
@@ -126,6 +152,16 @@ jobs:
         with:
           php-version: ${{ env.PHP_VERSION }}
           tools: composer:v2
+
+      - name: Create .env file
+        working-directory: ./backend
+        run: |
+          cp .env.example .env || cat > .env <<'EOT'
+          APP_NAME=Salon
+          APP_ENV=testing
+          APP_KEY=base64:test
+          APP_DEBUG=true
+          EOT
 
       - name: Install Composer dependencies
         working-directory: ./backend
@@ -269,6 +305,16 @@ jobs:
         with:
           php-version: ${{ env.PHP_VERSION }}
           tools: composer:v2
+
+      - name: Create .env file
+        working-directory: ./backend
+        run: |
+          cp .env.example .env || cat > .env <<'EOT'
+          APP_NAME=Salon
+          APP_ENV=testing
+          APP_KEY=base64:test
+          APP_DEBUG=true
+          EOT
 
       - name: Install backend dependencies
         working-directory: ./backend
