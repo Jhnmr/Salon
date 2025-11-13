@@ -21,12 +21,8 @@ import { get, post, put, del } from './api';
  * @returns {Promise<Object>} Services list with pagination
  */
 export const getServices = async (filters = {}) => {
-  try {
-    const response = await get('/services', { params: filters });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/services', { params: filters });
+  return response.data;
 };
 
 /**
@@ -35,12 +31,8 @@ export const getServices = async (filters = {}) => {
  * @returns {Promise<Object>} Service data
  */
 export const getService = async (id) => {
-  try {
-    const response = await get(`/services/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get(`/services/${id}`);
+  return response.data;
 };
 
 /**
@@ -50,14 +42,10 @@ export const getService = async (id) => {
  * @returns {Promise<Object>} Search results
  */
 export const searchServices = async (query, filters = {}) => {
-  try {
-    const response = await get('/services/search', {
-      params: { q: query, ...filters },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/services/search', {
+    params: { q: query, ...filters },
+  });
+  return response.data;
 };
 
 /**
@@ -65,12 +53,8 @@ export const searchServices = async (query, filters = {}) => {
  * @returns {Promise<Array>} Service categories list
  */
 export const getServiceCategories = async () => {
-  try {
-    const response = await get('/services/categories');
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/services/categories');
+  return response.data;
 };
 
 /**
@@ -80,14 +64,10 @@ export const getServiceCategories = async () => {
  * @returns {Promise<Object>} Services in category
  */
 export const getServicesByCategory = async (categoryId, filters = {}) => {
-  try {
-    const response = await get(`/services/categories/${categoryId}/services`, {
-      params: filters,
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get(`/services/categories/${categoryId}/services`, {
+    params: filters,
+  });
+  return response.data;
 };
 
 /**
@@ -96,14 +76,10 @@ export const getServicesByCategory = async (categoryId, filters = {}) => {
  * @returns {Promise<Array>} Popular services
  */
 export const getPopularServices = async (limit = 10) => {
-  try {
-    const response = await get('/services/popular', {
-      params: { limit },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/services/popular', {
+    params: { limit },
+  });
+  return response.data;
 };
 
 /**
@@ -112,12 +88,8 @@ export const getPopularServices = async (limit = 10) => {
  * @returns {Promise<Array>} Stylist's services
  */
 export const getStylistServices = async (stylistId) => {
-  try {
-    const response = await get(`/stylists/${stylistId}/services`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get(`/stylists/${stylistId}/services`);
+  return response.data;
 };
 
 /**
@@ -131,12 +103,8 @@ export const getStylistServices = async (stylistId) => {
  * @returns {Promise<Object>} Created service
  */
 export const createService = async (data) => {
-  try {
-    const response = await post('/services', data);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await post('/services', data);
+  return response.data;
 };
 
 /**
@@ -146,12 +114,8 @@ export const createService = async (data) => {
  * @returns {Promise<Object>} Updated service
  */
 export const updateService = async (id, data) => {
-  try {
-    const response = await put(`/services/${id}`, data);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await put(`/services/${id}`, data);
+  return response.data;
 };
 
 /**
@@ -160,11 +124,7 @@ export const updateService = async (id, data) => {
  * @returns {Promise<void>}
  */
 export const deleteService = async (id) => {
-  try {
-    await del(`/services/${id}`);
-  } catch (error) {
-    throw error;
-  }
+  await del(`/services/${id}`);
 };
 
 /**
@@ -173,12 +133,8 @@ export const deleteService = async (id) => {
  * @returns {Promise<Array>} Service pricing tiers
  */
 export const getServicePricing = async (serviceId) => {
-  try {
-    const response = await get(`/services/${serviceId}/pricing`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get(`/services/${serviceId}/pricing`);
+  return response.data;
 };
 
 export default {

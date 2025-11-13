@@ -14,12 +14,8 @@ import { get, post, put, del } from './api';
  * @returns {Promise<Object>} Payments list with pagination
  */
 export const getPayments = async (filters = {}) => {
-  try {
-    const response = await get('/payments', { params: filters });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/payments', { params: filters });
+  return response.data;
 };
 
 /**
@@ -28,12 +24,8 @@ export const getPayments = async (filters = {}) => {
  * @returns {Promise<Object>} Payment data
  */
 export const getPayment = async (id) => {
-  try {
-    const response = await get(`/payments/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get(`/payments/${id}`);
+  return response.data;
 };
 
 /**
@@ -44,15 +36,11 @@ export const getPayment = async (id) => {
  * @returns {Promise<Object>} Payment intent with client secret
  */
 export const createPaymentIntent = async (reservationId, options = {}) => {
-  try {
-    const response = await post('/payments/intent', {
-      reservation_id: reservationId,
-      ...options,
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await post('/payments/intent', {
+    reservation_id: reservationId,
+    ...options,
+  });
+  return response.data;
 };
 
 /**
@@ -62,15 +50,11 @@ export const createPaymentIntent = async (reservationId, options = {}) => {
  * @returns {Promise<Object>} Confirmed payment
  */
 export const confirmPayment = async (paymentIntentId, paymentDetails = {}) => {
-  try {
-    const response = await post('/payments/confirm', {
-      payment_intent_id: paymentIntentId,
-      ...paymentDetails,
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await post('/payments/confirm', {
+    payment_intent_id: paymentIntentId,
+    ...paymentDetails,
+  });
+  return response.data;
 };
 
 /**
@@ -78,12 +62,8 @@ export const confirmPayment = async (paymentIntentId, paymentDetails = {}) => {
  * @returns {Promise<Array>} List of saved payment methods
  */
 export const getPaymentMethods = async () => {
-  try {
-    const response = await get('/payments/methods');
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/payments/methods');
+  return response.data;
 };
 
 /**
@@ -95,12 +75,8 @@ export const getPaymentMethods = async () => {
  * @returns {Promise<Object>} Saved payment method
  */
 export const savePaymentMethod = async (data) => {
-  try {
-    const response = await post('/payments/methods', data);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await post('/payments/methods', data);
+  return response.data;
 };
 
 /**
@@ -109,11 +85,7 @@ export const savePaymentMethod = async (data) => {
  * @returns {Promise<void>}
  */
 export const deletePaymentMethod = async (id) => {
-  try {
-    await del(`/payments/methods/${id}`);
-  } catch (error) {
-    throw error;
-  }
+  await del(`/payments/methods/${id}`);
 };
 
 /**
@@ -122,12 +94,8 @@ export const deletePaymentMethod = async (id) => {
  * @returns {Promise<Object>} Updated payment method
  */
 export const setDefaultPaymentMethod = async (id) => {
-  try {
-    const response = await put(`/payments/methods/${id}/default`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await put(`/payments/methods/${id}/default`);
+  return response.data;
 };
 
 /**
@@ -138,15 +106,11 @@ export const setDefaultPaymentMethod = async (id) => {
  * @returns {Promise<Object>} Refund details
  */
 export const requestRefund = async (paymentId, reason, amount = null) => {
-  try {
-    const data = { reason };
-    if (amount) data.amount = amount;
+  const data = { reason };
+  if (amount) data.amount = amount;
 
-    const response = await post(`/payments/${paymentId}/refund`, data);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await post(`/payments/${paymentId}/refund`, data);
+  return response.data;
 };
 
 /**
@@ -156,14 +120,10 @@ export const requestRefund = async (paymentId, reason, amount = null) => {
  * @returns {Promise<Object>} Payment history with pagination
  */
 export const getPaymentHistory = async (page = 1, perPage = 20) => {
-  try {
-    const response = await get('/payments/history', {
-      params: { page, per_page: perPage },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/payments/history', {
+    params: { page, per_page: perPage },
+  });
+  return response.data;
 };
 
 /**
@@ -172,14 +132,10 @@ export const getPaymentHistory = async (page = 1, perPage = 20) => {
  * @returns {Promise<Object>} Payment statistics
  */
 export const getPaymentStats = async (period = 'month') => {
-  try {
-    const response = await get('/payments/stats', {
-      params: { period },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get('/payments/stats', {
+    params: { period },
+  });
+  return response.data;
 };
 
 /**
@@ -189,15 +145,11 @@ export const getPaymentStats = async (period = 'month') => {
  * @returns {Promise<Object>} Payment record
  */
 export const processCashPayment = async (reservationId, amount) => {
-  try {
-    const response = await post('/payments/cash', {
-      reservation_id: reservationId,
-      amount,
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await post('/payments/cash', {
+    reservation_id: reservationId,
+    amount,
+  });
+  return response.data;
 };
 
 /**
@@ -207,14 +159,10 @@ export const processCashPayment = async (reservationId, amount) => {
  * @returns {Promise<Object>} Updated payment
  */
 export const addTip = async (paymentId, tipAmount) => {
-  try {
-    const response = await post(`/payments/${paymentId}/tip`, {
-      tip_amount: tipAmount,
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await post(`/payments/${paymentId}/tip`, {
+    tip_amount: tipAmount,
+  });
+  return response.data;
 };
 
 /**
@@ -223,14 +171,10 @@ export const addTip = async (paymentId, tipAmount) => {
  * @returns {Promise<Blob>} Receipt PDF blob
  */
 export const downloadReceipt = async (paymentId) => {
-  try {
-    const response = await get(`/payments/${paymentId}/receipt`, {
-      responseType: 'blob',
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await get(`/payments/${paymentId}/receipt`, {
+    responseType: 'blob',
+  });
+  return response.data;
 };
 
 export default {
