@@ -49,6 +49,7 @@ class Stylist extends Model
         'branch_id',
         'bio',
         'specialty',
+        'specialties',
         'years_experience',
         'certifications',
         'commission_percentage',
@@ -57,6 +58,7 @@ class Stylist extends Model
         'total_reviews',
         'total_services_completed',
         'is_active',
+        'is_featured',
         'start_date',
         'end_date',
     ];
@@ -67,6 +69,7 @@ class Stylist extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'specialties' => 'array',
         'certifications' => 'array',
         'commission_percentage' => 'decimal:2',
         'tips_enabled' => 'boolean',
@@ -74,6 +77,7 @@ class Stylist extends Model
         'total_reviews' => 'integer',
         'total_services_completed' => 'integer',
         'is_active' => 'boolean',
+        'is_featured' => 'boolean',
         'start_date' => 'date',
         'end_date' => 'date',
     ];

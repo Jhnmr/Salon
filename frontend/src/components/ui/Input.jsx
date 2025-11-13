@@ -86,7 +86,7 @@ const Input = forwardRef(({
 Input.displayName = 'Input';
 
 Input.propTypes = {
-  type: PropTypes.oneOf(['text', 'email', 'password', 'tel', 'number', 'url', 'search']),
+  type: PropTypes.oneOf(['text', 'email', 'password', 'tel', 'number', 'url', 'search', 'date', 'time', 'datetime-local']),
   label: PropTypes.string,
   error: PropTypes.string,
   helpText: PropTypes.string,

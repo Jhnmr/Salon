@@ -7,14 +7,10 @@ import PropTypes from 'prop-types';
  */
 const Card = ({
   children,
-  title,
-  subtitle,
-  footer,
-  elevated = false,
-  shadow = 'md',
+  variant = 'flat',
   padding = 'md',
+  onClick,
   className = '',
-  headerAction,
   ...props
 }) => {
   // Padding variants
@@ -26,73 +22,89 @@ const Card = ({
     xl: 'p-8',
   };
 
-  // Shadow variants
-  const shadowStyles = {
-    none: '',
-    sm: 'shadow-sm',
-    md: 'shadow-md',
-    lg: 'shadow-lg',
-    xl: 'shadow-xl',
+  // Variant styles
+  const variantStyles = {
+    flat: 'bg-gray-800 border border-gray-700',
+    outlined: 'bg-transparent border-2 border-gray-700',
+    elevated: 'bg-gray-800 border border-gray-700 shadow-xl transform hover:scale-[1.02] transition-transform duration-200',
   };
 
   const baseStyles = `
-    bg-gray-800 border border-gray-700 rounded-xl
-    ${elevated ? 'transform hover:scale-[1.02] transition-transform duration-200' : ''}
-    ${shadowStyles[shadow]}
+    rounded-xl
+    ${variantStyles[variant]}
+    ${onClick ? 'cursor-pointer' : ''}
   `;
 
   return (
-    <div className={`${baseStyles} ${className}`} {...props}>
-      {/* Header */}
-      {(title || subtitle || headerAction) && (
-        <div className={`border-b border-gray-700 ${paddingStyles[padding]}`}>
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              {title && (
-                <h3 className="text-lg font-semibold text-white">
-                  {title}
-                </h3>
-              )}
-              {subtitle && (
-                <p className="mt-1 text-sm text-gray-400">
-                  {subtitle}
-                </p>
-              )}
-            </div>
-            {headerAction && (
-              <div className="ml-4">
-                {headerAction}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Content */}
-      <div className={paddingStyles[padding]}>
-        {children}
-      </div>
-
-      {/* Footer */}
-      {footer && (
-        <div className={`border-t border-gray-700 ${paddingStyles[padding]}`}>
-          {footer}
-        </div>
-      )}
+    <div
+      className={`${baseStyles} ${className}`}
+      onClick={onClick}
+      {...props}
+    >
+      {children}
     </div>
   );
 };
 
+// Card Image Subcomponent
+Card.Image = ({ src, alt = '', className = '' }) => (
+  <div className="w-full overflow-hidden rounded-t-xl">
+    <img
+      src={src}
+      alt={alt}
+      className={`w-full h-full object-cover ${className}`}
+    />
+  </div>
+);
+
+// Card Header Subcomponent
+Card.Header = ({ children, className = '' }) => (
+  <div className={`px-6 py-4 border-b border-gray-700 ${className}`}>
+    {children}
+  </div>
+);
+
+// Card Body Subcomponent
+Card.Body = ({ children, className = '' }) => (
+  <div className={`px-6 py-4 ${className}`}>
+    {children}
+  </div>
+);
+
+// Card Footer Subcomponent
+Card.Footer = ({ children, className = '' }) => (
+  <div className={`px-6 py-4 border-t border-gray-700 ${className}`}>
+    {children}
+  </div>
+);
+
 Card.propTypes = {
   children: PropTypes.node.isRequired,
-  title: PropTypes.string,
-  subtitle: PropTypes.string,
-  footer: PropTypes.node,
-  elevated: PropTypes.bool,
-  shadow: PropTypes.oneOf(['none', 'sm', 'md', 'lg', 'xl']),
+  variant: PropTypes.oneOf(['flat', 'outlined', 'elevated']),
   padding: PropTypes.oneOf(['none', 'sm', 'md', 'lg', 'xl']),
+  onClick: PropTypes.func,
   className: PropTypes.string,
-  headerAction: PropTypes.node,
+};
+
+Card.Image.propTypes = {
+  src: PropTypes.string.isRequired,
+  alt: PropTypes.string,
+  className: PropTypes.string,
+};
+
+Card.Header.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+};
+
+Card.Body.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+};
+
+Card.Footer.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
 };
 
 export default Card;

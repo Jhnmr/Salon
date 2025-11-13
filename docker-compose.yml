@@ -1,0 +1,219 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: salon_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-salon}
+      POSTGRES_USER: ${DB_USERNAME:-salon}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    networks:
+      - salon_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-salon} -d ${DB_DATABASE:-salon}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: salon_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-secret}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - salon_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Laravel Backend Application
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - PHP_VERSION=8.3
+    container_name: salon_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    environment:
+      - APP_NAME=SALON
+      - APP_ENV=${APP_ENV:-production}
+      - APP_KEY=${APP_KEY}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - APP_URL=${APP_URL:-http://localhost}
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=${DB_DATABASE:-salon}
+      - DB_USERNAME=${DB_USERNAME:-salon}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-secret}
+      - REDIS_PORT=6379
+      - CACHE_DRIVER=redis
+      - SESSION_DRIVER=redis
+      - QUEUE_CONNECTION=redis
+      - FILESYSTEM_DISK=public
+    volumes:
+      - ./backend:/var/www/html
+      - storage_data:/var/www/html/storage
+      - ./backend/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - salon_network
+
+  # Nginx Web Server
+  nginx:
+    image: nginx:alpine
+    container_name: salon_nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-8000}:80"
+    volumes:
+      - ./backend:/var/www/html:ro
+      - ./backend/docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - storage_data:/var/www/html/storage:ro
+    depends_on:
+      - app
+    networks:
+      - salon_network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # React Frontend Application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: ${FRONTEND_TARGET:-development}
+      args:
+        - NODE_ENV=${NODE_ENV:-development}
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+    container_name: salon_frontend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - frontend_build:/app/dist
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      - nginx
+    networks:
+      - salon_network
+    command: npm run dev -- --host
+
+  # Queue Worker (Optional - for background jobs)
+  queue:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: salon_queue
+    restart: unless-stopped
+    working_dir: /var/www/html
+    environment:
+      - APP_NAME=SALON
+      - APP_ENV=${APP_ENV:-production}
+      - APP_KEY=${APP_KEY}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=${DB_DATABASE:-salon}
+      - DB_USERNAME=${DB_USERNAME:-salon}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-secret}
+      - REDIS_PORT=6379
+      - QUEUE_CONNECTION=redis
+    volumes:
+      - ./backend:/var/www/html
+      - storage_data:/var/www/html/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - salon_network
+    command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+
+  # Scheduler (Optional - for scheduled tasks)
+  scheduler:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: salon_scheduler
+    restart: unless-stopped
+    working_dir: /var/www/html
+    environment:
+      - APP_NAME=SALON
+      - APP_ENV=${APP_ENV:-production}
+      - APP_KEY=${APP_KEY}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=${DB_DATABASE:-salon}
+      - DB_USERNAME=${DB_USERNAME:-salon}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-secret}
+    volumes:
+      - ./backend:/var/www/html
+      - storage_data:/var/www/html/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - salon_network
+    command: >
+      sh -c "while true; do
+        php artisan schedule:run --verbose --no-interaction &
+        sleep 60
+      done"
+
+networks:
+  salon_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  storage_data:
+    driver: local
+  frontend_build:
+    driver: local
