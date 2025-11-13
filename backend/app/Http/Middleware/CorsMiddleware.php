@@ -202,26 +202,24 @@ class CorsMiddleware
      */
     protected function getAllowedOrigins(): array
     {
+        // Get origins from config (which reads from .env)
         $origins = config('security.cors.allowed_origins');
 
-        // If not set in config, get from environment variable
+        // If not set in config, use default origins
         if (empty($origins)) {
-            $envOrigins = env('CORS_ALLOWED_ORIGINS', '');
-
-            if (empty($envOrigins)) {
-                // Default origins
-                return [
-                    'https://salon.com',
-                    'http://localhost:3000',
-                    'http://localhost:5173'
-                ];
-            }
-
-            // Parse comma-separated origins
-            $origins = array_map('trim', explode(',', $envOrigins));
+            return [
+                'https://salon.com',
+                'http://localhost:3000',
+                'http://localhost:5173'
+            ];
         }
 
-        return array_filter($origins);
+        // If it's a string (comma-separated), parse it
+        if (is_string($origins)) {
+            $origins = array_map('trim', explode(',', $origins));
+        }
+
+        return array_filter((array) $origins);
     }
 
     /**
