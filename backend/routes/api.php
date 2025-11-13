@@ -10,77 +10,326 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AvailabilityController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\BranchController;
+use App\Http\Controllers\StylistController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AuditLogController;
 
-// Auth routes (public)
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/auth/refresh', [AuthController::class, 'refresh']);
+/*
+|--------------------------------------------------------------------------
+| API Routes - Version 1
+|--------------------------------------------------------------------------
+|
+| RESTful API routes for the SALON application with proper authentication,
+| authorization, and rate limiting.
+|
+*/
 
-// Public profile routes
-Route::get('/stylists', [ProfileController::class, 'getStylistProfiles']);
-Route::get('/profiles/{userId}', [ProfileController::class, 'getByUserId']);
+// ============================================================================
+// PUBLIC ROUTES (No Authentication Required)
+// ============================================================================
 
-// Public service routes
-Route::get('/services', [ServiceController::class, 'index']);
-Route::get('/services/{id}', [ServiceController::class, 'show']);
-Route::get('/services/category/{category}', [ServiceController::class, 'getByCategory']);
+Route::prefix('v1')->group(function () {
 
-// Public reservation routes
-Route::get('/reservations/available-slots', [ReservationController::class, 'getAvailableSlots']);
-Route::get('/reservations/stylist/{stylistId}', [ReservationController::class, 'getStylistReservations']);
+    // Authentication Routes
+    Route::prefix('auth')->group(function () {
+        Route::post('/register', [AuthController::class, 'register']);
+        Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/refresh', [AuthController::class, 'refresh']);
+        Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+        Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    });
 
-// Public availability routes
-Route::get('/availability/{stylistId}', [AvailabilityController::class, 'show']);
-Route::get('/availability/{stylistId}/{day}', [AvailabilityController::class, 'getByDay']);
+    // Public Profile Routes
+    Route::prefix('profiles')->group(function () {
+        Route::get('/stylists', [ProfileController::class, 'getStylistProfiles']);
+        Route::get('/{userId}', [ProfileController::class, 'getByUserId']);
+    });
 
-Route::middleware('jwt')->group(function () {
-    // Auth (protected)
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/user', [AuthController::class, 'user']);
-    Route::post('/auth/revoke-all', [AuthController::class, 'revokeAll']);
+    // Public Service Routes
+    Route::prefix('services')->group(function () {
+        Route::get('/', [ServiceController::class, 'index']);
+        Route::get('/{id}', [ServiceController::class, 'show']);
+        Route::get('/category/{category}', [ServiceController::class, 'getByCategory']);
+    });
 
-    // Profile
-    Route::get('/profile', [ProfileController::class, 'show']);
-    Route::post('/profile', [ProfileController::class, 'store']);
+    // Public Branch Routes
+    Route::prefix('branches')->group(function () {
+        Route::get('/', [BranchController::class, 'index']);
+        Route::get('/{id}', [BranchController::class, 'show']);
+    });
 
-    // Services (admin only for create/update/delete)
-    Route::post('/services', [ServiceController::class, 'store']);
-    Route::put('/services/{id}', [ServiceController::class, 'update']);
-    Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
+    // Public Stylist Routes
+    Route::prefix('stylists')->group(function () {
+        Route::get('/', [StylistController::class, 'index']);
+        Route::get('/{id}', [StylistController::class, 'show']);
+        Route::get('/{id}/reviews', [StylistController::class, 'reviews']);
+    });
 
-    // Reservations
-    Route::get('/reservations', [ReservationController::class, 'index']);
-    Route::get('/reservations/{id}', [ReservationController::class, 'show']);
-    Route::post('/reservations', [ReservationController::class, 'store']);
-    Route::put('/reservations/{id}', [ReservationController::class, 'update']);
-    Route::post('/reservations/{id}/cancel', [ReservationController::class, 'cancel']);
+    // Public Post Routes (portfolio)
+    Route::prefix('posts')->group(function () {
+        Route::get('/', [PostController::class, 'index']);
+        Route::get('/{id}', [PostController::class, 'show']);
+    });
 
-    // Users (admin only)
-    Route::get('/users', [UserController::class, 'index']);
-    Route::get('/users/role/{role}', [UserController::class, 'getByRole']);
-    Route::get('/users/{id}', [UserController::class, 'show']);
-    Route::put('/users/{id}', [UserController::class, 'update']);
-    Route::post('/users/{id}/deactivate', [UserController::class, 'deactivate']);
-    Route::post('/users/{id}/activate', [UserController::class, 'activate']);
-    Route::delete('/users/{id}', [UserController::class, 'destroy']);
-    Route::get('/users/statistics/all', [UserController::class, 'getStatistics']);
+    // Public Availability Routes
+    Route::prefix('availability')->group(function () {
+        Route::get('/{stylistId}', [AvailabilityController::class, 'show']);
+        Route::get('/{stylistId}/{day}', [AvailabilityController::class, 'getByDay']);
+    });
 
-    // Availability
-    Route::get('/availability/mine', [AvailabilityController::class, 'myAvailability']);
-    Route::post('/availability', [AvailabilityController::class, 'store']);
-    Route::put('/availability/{id}', [AvailabilityController::class, 'update']);
-    Route::delete('/availability/{id}', [AvailabilityController::class, 'destroy']);
-    Route::post('/availability/bulk-set', [AvailabilityController::class, 'bulkSet']);
+    // Public Promotion Routes
+    Route::prefix('promotions')->group(function () {
+        Route::get('/', [PromotionController::class, 'index']);
+        Route::get('/{id}', [PromotionController::class, 'show']);
+    });
 
-    // Notifications
-    Route::get('/notifications', [NotificationController::class, 'index']);
-    Route::get('/notifications/unread', [NotificationController::class, 'unread']);
-    Route::get('/notifications/unread/count', [NotificationController::class, 'unreadCount']);
-    Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
-    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
-    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+    // Public Reservation Routes
+    Route::get('/reservations/available-slots', [ReservationController::class, 'getAvailableSlots']);
 
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index']);
-    Route::get('/dashboard/stats', [DashboardController::class, 'quickStats']);
+});
+
+// ============================================================================
+// AUTHENTICATED ROUTES (JWT Middleware Required)
+// ============================================================================
+
+Route::prefix('v1')->middleware('jwt')->group(function () {
+
+    // Auth Protected Routes
+    Route::prefix('auth')->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::get('/user', [AuthController::class, 'user']);
+        Route::post('/revoke-all', [AuthController::class, 'revokeAll']);
+        Route::put('/update-profile', [AuthController::class, 'updateProfile']);
+        Route::put('/change-password', [AuthController::class, 'changePassword']);
+    });
+
+    // Profile Routes
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'show']);
+        Route::post('/', [ProfileController::class, 'store']);
+        Route::put('/', [ProfileController::class, 'update']);
+    });
+
+    // ========================================================================
+    // POSTS ROUTES (Social Portfolio)
+    // ========================================================================
+    Route::prefix('posts')->group(function () {
+        // Authenticated users can view feed
+        Route::get('/feed', [PostController::class, 'feed']);
+
+        // Stylists only - create, update, delete posts
+        Route::post('/', [PostController::class, 'store']);
+        Route::put('/{id}', [PostController::class, 'update']);
+        Route::delete('/{id}', [PostController::class, 'destroy']);
+
+        // All authenticated users can like and comment
+        Route::post('/{id}/like', [PostController::class, 'toggleLike']);
+        Route::post('/{id}/comment', [PostController::class, 'addComment']);
+    });
+
+    // ========================================================================
+    // CONVERSATIONS ROUTES (Chat)
+    // ========================================================================
+    Route::prefix('conversations')->group(function () {
+        Route::get('/', [ConversationController::class, 'index']);
+        Route::get('/search', [ConversationController::class, 'search']);
+        Route::get('/{id}', [ConversationController::class, 'show']);
+        Route::post('/', [ConversationController::class, 'store']);
+        Route::delete('/{id}', [ConversationController::class, 'destroy']);
+        Route::get('/{id}/messages', [ConversationController::class, 'messages']);
+        Route::put('/{id}/read', [ConversationController::class, 'markAsRead']);
+    });
+
+    // ========================================================================
+    // MESSAGES ROUTES (Chat Messages)
+    // ========================================================================
+    Route::prefix('messages')->group(function () {
+        Route::post('/', [MessageController::class, 'store']);
+        Route::put('/{id}', [MessageController::class, 'update']);
+        Route::delete('/{id}', [MessageController::class, 'destroy']);
+        Route::put('/{id}/read', [MessageController::class, 'markAsRead']);
+        Route::get('/unread-count', [MessageController::class, 'unreadCount']);
+        Route::get('/search', [MessageController::class, 'search']);
+    });
+
+    // ========================================================================
+    // PROMOTIONS ROUTES (Discounts)
+    // ========================================================================
+    Route::prefix('promotions')->group(function () {
+        // All authenticated users can validate and apply
+        Route::post('/validate', [PromotionController::class, 'validate']);
+        Route::post('/apply', [PromotionController::class, 'apply']);
+
+        // Admin only - CRUD operations
+        Route::post('/', [PromotionController::class, 'store']);
+        Route::put('/{id}', [PromotionController::class, 'update']);
+        Route::delete('/{id}', [PromotionController::class, 'destroy']);
+        Route::get('/{id}/statistics', [PromotionController::class, 'statistics']);
+    });
+
+    // ========================================================================
+    // RESERVATIONS ROUTES
+    // ========================================================================
+    Route::prefix('reservations')->group(function () {
+        Route::get('/', [ReservationController::class, 'index']);
+        Route::get('/{id}', [ReservationController::class, 'show']);
+        Route::post('/', [ReservationController::class, 'store']);
+        Route::put('/{id}', [ReservationController::class, 'update']);
+
+        // Reservation actions
+        Route::post('/check-availability', [ReservationController::class, 'checkAvailability']);
+        Route::post('/{id}/cancel', [ReservationController::class, 'cancel']);
+        Route::post('/{id}/confirm', [ReservationController::class, 'confirm']);
+        Route::post('/{id}/complete', [ReservationController::class, 'complete']);
+    });
+
+    // ========================================================================
+    // SERVICES ROUTES (Admin only for CUD operations)
+    // ========================================================================
+    Route::prefix('services')->group(function () {
+        Route::post('/', [ServiceController::class, 'store']);
+        Route::put('/{id}', [ServiceController::class, 'update']);
+        Route::delete('/{id}', [ServiceController::class, 'destroy']);
+    });
+
+    // ========================================================================
+    // BRANCHES ROUTES (Admin only for CUD operations)
+    // ========================================================================
+    Route::prefix('branches')->group(function () {
+        Route::post('/', [BranchController::class, 'store']);
+        Route::put('/{id}', [BranchController::class, 'update']);
+        Route::delete('/{id}', [BranchController::class, 'destroy']);
+    });
+
+    // ========================================================================
+    // STYLISTS ROUTES
+    // ========================================================================
+    Route::prefix('stylists')->group(function () {
+        Route::post('/', [StylistController::class, 'store']);
+        Route::put('/{id}', [StylistController::class, 'update']);
+        Route::delete('/{id}', [StylistController::class, 'destroy']);
+        Route::get('/{id}/schedule', [StylistController::class, 'schedule']);
+    });
+
+    // ========================================================================
+    // USERS ROUTES (Admin only)
+    // ========================================================================
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'index']);
+        Route::get('/role/{role}', [UserController::class, 'getByRole']);
+        Route::get('/statistics', [UserController::class, 'getStatistics']);
+        Route::get('/{id}', [UserController::class, 'show']);
+        Route::put('/{id}', [UserController::class, 'update']);
+        Route::delete('/{id}', [UserController::class, 'destroy']);
+        Route::post('/{id}/activate', [UserController::class, 'activate']);
+        Route::post('/{id}/deactivate', [UserController::class, 'deactivate']);
+    });
+
+    // ========================================================================
+    // AVAILABILITY ROUTES (Stylist only)
+    // ========================================================================
+    Route::prefix('availability')->group(function () {
+        Route::get('/mine', [AvailabilityController::class, 'myAvailability']);
+        Route::post('/', [AvailabilityController::class, 'store']);
+        Route::put('/{id}', [AvailabilityController::class, 'update']);
+        Route::delete('/{id}', [AvailabilityController::class, 'destroy']);
+        Route::post('/bulk-set', [AvailabilityController::class, 'bulkSet']);
+    });
+
+    // ========================================================================
+    // NOTIFICATIONS ROUTES
+    // ========================================================================
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::get('/unread', [NotificationController::class, 'unread']);
+        Route::get('/unread/count', [NotificationController::class, 'unreadCount']);
+        Route::put('/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+        Route::delete('/{id}', [NotificationController::class, 'destroy']);
+    });
+
+    // ========================================================================
+    // DASHBOARD ROUTES (Role-based)
+    // ========================================================================
+    Route::prefix('dashboard')->group(function () {
+        // Generic dashboard (auto-detects role)
+        Route::get('/', [DashboardController::class, 'index']);
+        Route::get('/stats', [DashboardController::class, 'quickStats']);
+
+        // Role-specific dashboards
+        Route::get('/client', [DashboardController::class, 'clientDashboard']);
+        Route::get('/stylist', [DashboardController::class, 'stylistDashboard']);
+        Route::get('/admin', [DashboardController::class, 'adminDashboard']);
+        Route::get('/super-admin', [DashboardController::class, 'superAdminDashboard']);
+
+        // Analytics (admin only)
+        Route::get('/analytics', [DashboardController::class, 'analytics']);
+    });
+
+    // ========================================================================
+    // INVOICES ROUTES
+    // ========================================================================
+    Route::prefix('invoices')->group(function () {
+        Route::get('/', [InvoiceController::class, 'index']);
+        Route::get('/{id}', [InvoiceController::class, 'show']);
+        Route::post('/', [InvoiceController::class, 'store']);
+        Route::put('/{id}', [InvoiceController::class, 'update']);
+        Route::get('/{id}/download', [InvoiceController::class, 'download']);
+    });
+
+    // ========================================================================
+    // PAYMENTS ROUTES
+    // ========================================================================
+    Route::prefix('payments')->group(function () {
+        Route::get('/', [PaymentController::class, 'index']);
+        Route::get('/{id}', [PaymentController::class, 'show']);
+        Route::post('/', [PaymentController::class, 'store']);
+        Route::post('/process', [PaymentController::class, 'process']);
+        Route::post('/{id}/refund', [PaymentController::class, 'refund']);
+        Route::get('/methods', [PaymentController::class, 'paymentMethods']);
+    });
+
+    // ========================================================================
+    // AUDIT LOGS ROUTES (Admin only)
+    // ========================================================================
+    Route::prefix('audit-logs')->group(function () {
+        Route::get('/', [AuditLogController::class, 'index']);
+        Route::get('/{id}', [AuditLogController::class, 'show']);
+    });
+
+    // ========================================================================
+    // REVIEWS ROUTES
+    // ========================================================================
+    Route::prefix('reviews')->group(function () {
+        Route::post('/', [\App\Http\Controllers\ReviewController::class, 'store']);
+        Route::put('/{id}', [\App\Http\Controllers\ReviewController::class, 'update']);
+        Route::delete('/{id}', [\App\Http\Controllers\ReviewController::class, 'destroy']);
+    });
+
+    // ========================================================================
+    // FAVORITES ROUTES
+    // ========================================================================
+    Route::prefix('favorites')->group(function () {
+        Route::get('/', [\App\Http\Controllers\FavoriteController::class, 'index']);
+        Route::post('/', [\App\Http\Controllers\FavoriteController::class, 'store']);
+        Route::delete('/{id}', [\App\Http\Controllers\FavoriteController::class, 'destroy']);
+    });
+});
+
+// ============================================================================
+// FALLBACK ROUTE
+// ============================================================================
+
+Route::fallback(function () {
+    return response()->json([
+        'success' => false,
+        'data' => null,
+        'message' => 'API endpoint not found',
+    ], 404);
 });

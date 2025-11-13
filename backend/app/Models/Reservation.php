@@ -16,10 +16,12 @@ class Reservation extends Model
         'scheduled_at',
         'status',
         'notes',
+        'total_price',
     ];
 
     protected $casts = [
         'scheduled_at' => 'datetime',
+        'total_price' => 'decimal:2',
     ];
 
     /**

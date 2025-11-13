@@ -20,6 +20,8 @@ class Service extends Model
         'is_active',
         'image_url',
         'sort_order',
+        'requires_deposit',
+        'deposit_amount',
     ];
 
     protected $casts = [
@@ -27,6 +29,8 @@ class Service extends Model
         'duration_minutes' => 'integer',
         'is_active' => 'boolean',
         'sort_order' => 'integer',
+        'requires_deposit' => 'boolean',
+        'deposit_amount' => 'decimal:2',
         'deleted_at' => 'datetime',
     ];
 

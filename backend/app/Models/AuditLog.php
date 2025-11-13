@@ -52,6 +52,11 @@ class AuditLog extends Model
         'new_data',
         'ip_address',
         'user_agent',
+        'request_method',
+        'request_path',
+        'status_code',
+        'duration_ms',
+        'metadata',
     ];
 
     /**
@@ -62,6 +67,9 @@ class AuditLog extends Model
     protected $casts = [
         'old_data' => 'array',
         'new_data' => 'array',
+        'metadata' => 'array',
+        'status_code' => 'integer',
+        'duration_ms' => 'float',
         'created_at' => 'datetime',
     ];
 
@@ -221,5 +229,127 @@ class AuditLog extends Model
         }
 
         return $changes;
+    }
+
+    /**
+     * Scope a query to filter by request method.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $method
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeRequestMethod($query, string $method)
+    {
+        return $query->where('request_method', strtoupper($method));
+    }
+
+    /**
+     * Scope a query to filter by request path.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $path
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeRequestPath($query, string $path)
+    {
+        return $query->where('request_path', 'like', "%{$path}%");
+    }
+
+    /**
+     * Scope a query to filter by status code.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  int  $statusCode
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeStatusCode($query, int $statusCode)
+    {
+        return $query->where('status_code', $statusCode);
+    }
+
+    /**
+     * Scope a query to filter by successful requests (2xx status codes).
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSuccessful($query)
+    {
+        return $query->whereBetween('status_code', [200, 299]);
+    }
+
+    /**
+     * Scope a query to filter by failed requests (4xx and 5xx status codes).
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeFailed($query)
+    {
+        return $query->where('status_code', '>=', 400);
+    }
+
+    /**
+     * Scope a query to filter by slow requests (above threshold).
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  float  $thresholdMs  Default: 1000ms (1 second)
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSlow($query, float $thresholdMs = 1000)
+    {
+        return $query->where('duration_ms', '>', $thresholdMs);
+    }
+
+    /**
+     * Check if the request was successful (2xx status code).
+     *
+     * @return bool
+     */
+    public function wasSuccessful(): bool
+    {
+        return $this->status_code >= 200 && $this->status_code < 300;
+    }
+
+    /**
+     * Check if the request was slow (above threshold).
+     *
+     * @param  float  $thresholdMs  Default: 1000ms (1 second)
+     * @return bool
+     */
+    public function wasSlow(float $thresholdMs = 1000): bool
+    {
+        return $this->duration_ms > $thresholdMs;
+    }
+
+    /**
+     * Get a human-readable duration.
+     *
+     * @return string
+     */
+    public function getFormattedDuration(): string
+    {
+        if (!$this->duration_ms) {
+            return 'N/A';
+        }
+
+        if ($this->duration_ms < 1000) {
+            return round($this->duration_ms, 2) . 'ms';
+        }
+
+        return round($this->duration_ms / 1000, 2) . 's';
+    }
+
+    /**
+     * Clean up old audit logs based on retention policy.
+     *
+     * @param  int|null  $days  Number of days to retain (defaults to config)
+     * @return int  Number of deleted records
+     */
+    public static function cleanOldLogs(?int $days = null): int
+    {
+        $days = $days ?? config('security.audit_logging.retention_days', 90);
+
+        return static::where('created_at', '<', now()->subDays($days))->delete();
     }
 }
