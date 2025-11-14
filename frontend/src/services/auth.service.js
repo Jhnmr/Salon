@@ -132,7 +132,7 @@ export const resetPassword = async (token, password, passwordConfirmation) => {
  */
 export const getCurrentUser = async () => {
   try {
-    const response = await get('/auth/me');
+    const response = await get('/auth/user'); // Fixed: changed from /auth/me to /auth/user
     const { user } = response.data;
 
     // Update user data in localStorage

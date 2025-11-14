@@ -36,13 +36,13 @@ use App\Http\Controllers\AuditLogController;
 
 Route::prefix('v1')->group(function () {
 
-    // Authentication Routes
+    // Authentication Routes (with rate limiting for security)
     Route::prefix('auth')->group(function () {
-        Route::post('/register', [AuthController::class, 'register']);
-        Route::post('/login', [AuthController::class, 'login']);
-        Route::post('/refresh', [AuthController::class, 'refresh']);
-        Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-        Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+        Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,60'); // 5 attempts per hour
+        Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,10'); // 5 attempts per 10 minutes
+        Route::post('/refresh', [AuthController::class, 'refresh'])->middleware('throttle:10,1'); // 10 per minute
+        Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:3,60'); // 3 per hour
+        Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:5,60'); // 5 per hour
     });
 
     // Public Profile Routes
@@ -187,6 +187,7 @@ Route::prefix('v1')->middleware('jwt')->group(function () {
         Route::post('/{id}/cancel', [ReservationController::class, 'cancel']);
         Route::post('/{id}/confirm', [ReservationController::class, 'confirm']);
         Route::post('/{id}/complete', [ReservationController::class, 'complete']);
+        Route::post('/{id}/reschedule', [ReservationController::class, 'reschedule']);
     });
 
     // ========================================================================

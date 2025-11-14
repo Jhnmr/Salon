@@ -40,12 +40,24 @@ class ReservationController extends Controller
     /**
      * Get specific reservation
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
+        $user = $request->user();
         $reservation = Reservation::with(['service', 'client', 'stylist'])->find($id);
 
         if (!$reservation) {
             return response()->json(['error' => 'Reservation not found'], 404);
+        }
+
+        // Authorization: Only client, assigned stylist, or admin can view
+        $isClient = $user->id === $reservation->client_id;
+        $isStylist = $user->id === $reservation->stylist_id;
+        $isAdmin = $user->role === 'admin';
+
+        if (!$isClient && !$isStylist && !$isAdmin) {
+            return response()->json([
+                'error' => 'Unauthorized to view this reservation'
+            ], 403);
         }
 
         return response()->json(['reservation' => $reservation]);
@@ -501,6 +513,129 @@ class ReservationController extends Controller
             return response()->json(['slots' => $slots]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to get available slots'], 500);
+        }
+    }
+
+    /**
+     * Reschedule a reservation to a new date/time
+     *
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function reschedule(Request $request, $id)
+    {
+        $user = $request->user();
+        $reservation = Reservation::find($id);
+
+        if (!$reservation) {
+            return response()->json([
+                'success' => false,
+                'data' => null,
+                'message' => 'Reservation not found'
+            ], 404);
+        }
+
+        // Check authorization - client or admin can reschedule
+        if ($user->id !== $reservation->client_id && $user->role !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'data' => null,
+                'message' => 'Unauthorized to reschedule this reservation'
+            ], 403);
+        }
+
+        // Can't reschedule cancelled or completed reservations
+        if (in_array($reservation->status, ['cancelled', 'completed', 'no_show'])) {
+            return response()->json([
+                'success' => false,
+                'data' => null,
+                'message' => 'Cannot reschedule ' . $reservation->status . ' reservations'
+            ], 400);
+        }
+
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'scheduled_at' => 'required|date|after:now',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->errors(),
+                'message' => 'Validation failed'
+            ], 422);
+        }
+
+        try {
+            $newScheduledAt = Carbon::parse($request->scheduled_at);
+
+            // Check if within business hours
+            $hour = $newScheduledAt->hour;
+            if ($hour < 9 || $hour >= 18) {
+                return response()->json([
+                    'success' => false,
+                    'data' => null,
+                    'message' => 'New time must be within business hours (9 AM - 6 PM)'
+                ], 400);
+            }
+
+            // Get service duration
+            $service = $reservation->service;
+            $endTime = $newScheduledAt->copy()->addMinutes($service->duration_minutes);
+
+            // Check for conflicting reservations at new time
+            $conflicting = Reservation::where('stylist_id', $reservation->stylist_id)
+                ->where('id', '!=', $id) // Exclude current reservation
+                ->where('status', '!=', 'cancelled')
+                ->where(function ($query) use ($newScheduledAt, $endTime) {
+                    $query->whereBetween('scheduled_at', [$newScheduledAt, $endTime])
+                        ->orWhere(function ($q) use ($newScheduledAt, $endTime) {
+                            $q->where('scheduled_at', '<=', $newScheduledAt)
+                              ->whereRaw('DATE_ADD(scheduled_at, INTERVAL (SELECT duration_minutes FROM services WHERE services.id = reservations.service_id) MINUTE) > ?', [$newScheduledAt]);
+                        });
+                })
+                ->exists();
+
+            if ($conflicting) {
+                return response()->json([
+                    'success' => false,
+                    'data' => null,
+                    'message' => 'The selected time slot is not available'
+                ], 400);
+            }
+
+            // Update reservation
+            $oldScheduledAt = $reservation->scheduled_at;
+            $reservation->update([
+                'scheduled_at' => $newScheduledAt,
+                'status' => 'pending', // Reset to pending on reschedule
+                'confirmed_at' => null,
+            ]);
+
+            $reservation->load(['service', 'stylist', 'client']);
+
+            // Create notification for stylist
+            \App\Models\Notification::create([
+                'user_id' => $reservation->stylist_id,
+                'type' => 'reservation_rescheduled',
+                'title' => 'Reservation Rescheduled',
+                'message' => 'A reservation has been rescheduled from ' .
+                           $oldScheduledAt->format('M d, Y \a\t h:i A') . ' to ' .
+                           $newScheduledAt->format('M d, Y \a\t h:i A'),
+                'is_read' => false,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => $reservation,
+                'message' => 'Reservation rescheduled successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'data' => null,
+                'message' => 'Failed to reschedule reservation'
+            ], 500);
         }
     }
 }

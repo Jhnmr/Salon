@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('stylists', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('user_id')->unique()->comment('FK a users');
+            $table->unsignedBigInteger('user_id')->unique()->comment('FK a users'); // Fixed: changed from unsignedInteger
             $table->unsignedBigInteger('branch_id')->nullable()->comment('FK a branches');
 
             // Información profesional

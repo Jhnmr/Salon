@@ -35,7 +35,7 @@ class StoreReservationRequest extends FormRequest
     {
         return [
             'service_id' => 'required|exists:services,id',
-            'stylist_id' => 'required|exists:stylists,id',
+            'stylist_id' => 'required|exists:users,id', // Fixed: users table, not stylists
             'scheduled_at' => 'required|date|after:now',
             'notes' => 'nullable|string|max:500',
             'promotion_code' => 'nullable|string|exists:promotions,code',
