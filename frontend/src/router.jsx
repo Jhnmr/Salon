@@ -27,7 +27,7 @@ import StylistProfilePage from './pages/StylistProfile';
 // Client pages
 import ClientDashboard from './pages/client/Dashboard';
 import MyReservationsPage from './pages/client/Reservations';
-import BookingPage from './pages/client/BookAppointment';
+import BookingPage from './pages/client/BookAppointmentEnhanced'; // ✨ Enhanced with Stripe & Promotions
 import MyProfilePage from './pages/client/Profile';
 import SearchServicesPage from './pages/client/SearchServices';
 
