@@ -64,7 +64,7 @@ class ReservationController extends Controller
     }
 
     /**
-     * Create a new reservation
+     * Create a new reservation with payment processing
      */
     public function store(Request $request)
     {
@@ -79,6 +79,10 @@ class ReservationController extends Controller
             'service_id' => 'required|exists:services,id',
             'stylist_id' => 'nullable|exists:users,id',
             'scheduled_at' => 'required|date|after:now',
+            'payment_method_id' => 'required|string',
+            'amount' => 'required|numeric|min:0',
+            'promotion_code' => 'nullable|string',
+            'notes' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -93,6 +97,7 @@ class ReservationController extends Controller
             }
 
             // Check if stylist is valid if provided
+            $stylist = null;
             if ($request->stylist_id) {
                 $stylist = \App\Models\User::find($request->stylist_id);
                 if (!$stylist || $stylist->role !== 'stylist' || !$stylist->is_active) {
@@ -100,22 +105,152 @@ class ReservationController extends Controller
                 }
             }
 
+            // Get branch_id from stylist or service
+            $branchId = $stylist->branch_id ?? $service->branch_id ?? 1;
+
+            // Calculate final amount (with promotion if provided)
+            $originalAmount = $request->amount;
+            $discountAmount = 0;
+            $finalAmount = $originalAmount;
+            $promotionCode = null;
+
+            if ($request->promotion_code) {
+                // Validate promotion code
+                $promotion = \App\Models\Promotion::where('code', strtoupper($request->promotion_code))
+                    ->where('is_active', true)
+                    ->where('valid_from', '<=', now())
+                    ->where('valid_until', '>=', now())
+                    ->first();
+
+                if ($promotion && $promotion->uses_count < $promotion->max_uses) {
+                    $discountAmount = $promotion->discount_type === 'percentage'
+                        ? ($originalAmount * $promotion->discount_value / 100)
+                        : $promotion->discount_value;
+
+                    $finalAmount = max(0, $originalAmount - $discountAmount);
+                    $promotionCode = $promotion->code;
+
+                    // Increment promotion usage
+                    $promotion->increment('uses_count');
+                }
+            }
+
+            // Process payment with Stripe
+            $stripeService = new \App\Services\StripeService();
+            $amountInCents = (int) ($finalAmount * 100);
+
+            $paymentResult = $stripeService->processPayment(
+                $amountInCents,
+                $request->payment_method_id,
+                [
+                    'user_id' => $user->id,
+                    'service_id' => $service->id,
+                    'stylist_id' => $request->stylist_id,
+                    'branch_id' => $branchId,
+                ]
+            );
+
+            if (!$paymentResult['success']) {
+                return response()->json([
+                    'error' => 'Payment failed',
+                    'message' => $paymentResult['error'] ?? 'Unable to process payment'
+                ], 400);
+            }
+
+            // Calculate commissions
+            $commissionService = new \App\Services\CommissionService();
+            $commissions = $commissionService->calculateCommissions($finalAmount, $branchId);
+
+            // Create reservation with commission data
             $reservation = Reservation::create([
                 'client_id' => $user->id,
                 'stylist_id' => $request->stylist_id,
                 'service_id' => $request->service_id,
+                'branch_id' => $branchId,
                 'scheduled_at' => $request->scheduled_at,
-                'status' => 'pending',
+                'status' => 'confirmed', // Auto-confirm on successful payment
+                'notes' => $request->notes,
+                'total_amount' => $commissions['total_amount'],
+                'platform_commission' => $commissions['platform_commission'],
+                'salon_commission' => $commissions['salon_commission'],
+                'stylist_earnings' => $commissions['stylist_earnings'],
+                'promotion_code' => $promotionCode,
+                'payment_intent_id' => $paymentResult['payment_intent_id'],
+                'service_price' => $originalAmount,
+                'discount_amount' => $discountAmount,
+                'total_price' => $finalAmount,
             ]);
 
-            $reservation->load(['service', 'stylist', 'client']);
+            // Create payment record
+            \App\Models\Payment::create([
+                'codigo_transaccion' => 'TXN-' . strtoupper(uniqid()),
+                'reservation_id' => $reservation->id,
+                'user_id' => $user->id,
+                'branch_id' => $branchId,
+                'amount_subtotal' => $originalAmount,
+                'amount_discount' => $discountAmount,
+                'amount_tax' => 0,
+                'amount_total' => $finalAmount,
+                'payment_method' => \App\Models\Payment::METHOD_CREDIT_CARD,
+                'payment_provider' => \App\Models\Payment::PROVIDER_STRIPE,
+                'stripe_payment_intent_id' => $paymentResult['payment_intent_id'],
+                'status' => \App\Models\Payment::STATUS_COMPLETED,
+                'commission_platform' => $commissions['platform_commission'],
+                'commission_percentage' => $commissions['platform_percentage'],
+                'amount_stylist' => $commissions['stylist_earnings'],
+                'amount_branch' => $commissions['salon_commission'],
+                'payment_date' => now(),
+                'client_ip' => $request->ip(),
+                'browser' => $request->userAgent(),
+                'metadata' => [
+                    'promotion_code' => $promotionCode,
+                    'original_amount' => $originalAmount,
+                    'discount_amount' => $discountAmount,
+                ],
+            ]);
+
+            $reservation->load(['service', 'stylist', 'client', 'payment']);
+
+            // Create notification for stylist
+            if ($stylist) {
+                \App\Models\Notification::create([
+                    'user_id' => $stylist->id,
+                    'type' => 'new_reservation',
+                    'title' => 'New Reservation',
+                    'message' => 'You have a new reservation from ' . $user->name . ' for ' .
+                                $service->name . ' on ' . Carbon::parse($request->scheduled_at)->format('M d, Y \a\t h:i A'),
+                    'is_read' => false,
+                ]);
+            }
 
             return response()->json([
-                'message' => 'Reservation created successfully',
+                'message' => 'Reservation created and payment processed successfully',
                 'reservation' => $reservation,
+                'payment' => [
+                    'amount' => $finalAmount,
+                    'status' => 'completed',
+                    'payment_intent_id' => $paymentResult['payment_intent_id'],
+                ],
+                'commissions' => $commissions,
             ], 201);
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            Log::error('Stripe payment error', [
+                'error' => $e->getMessage(),
+                'user_id' => $user->id,
+            ]);
+            return response()->json([
+                'error' => 'Payment processing failed',
+                'message' => $e->getMessage()
+            ], 400);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to create reservation'], 500);
+            Log::error('Reservation creation error', [
+                'error' => $e->getMessage(),
+                'user_id' => $user->id,
+            ]);
+            return response()->json([
+                'error' => 'Failed to create reservation',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 

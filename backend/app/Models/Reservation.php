@@ -43,6 +43,13 @@ class Reservation extends Model
         'browser',
         'creation_ip',
         'appointment_code',
+        // Payment & Commission fields
+        'total_amount',
+        'platform_commission',
+        'salon_commission',
+        'stylist_earnings',
+        'promotion_code',
+        'payment_intent_id',
     ];
 
     protected $casts = [
@@ -56,6 +63,10 @@ class Reservation extends Model
         'discount_amount' => 'decimal:2',
         'tip' => 'decimal:2',
         'cancellation_penalty' => 'decimal:2',
+        'total_amount' => 'decimal:2',
+        'platform_commission' => 'decimal:2',
+        'salon_commission' => 'decimal:2',
+        'stylist_earnings' => 'decimal:2',
         'reminder_sent' => 'boolean',
         'requires_confirmation' => 'boolean',
         'reminder_24h_sent' => 'boolean',
