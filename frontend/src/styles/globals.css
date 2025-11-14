@@ -111,10 +111,6 @@
    BASE STYLES
    ============================================ */
 @layer base {
-  * {
-    @apply border-border;
-  }
-
   html {
     @apply scroll-smooth;
   }

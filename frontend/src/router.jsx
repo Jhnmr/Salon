@@ -11,69 +11,46 @@ import ProtectedRoute, { PublicOnlyRoute } from './components/ProtectedRoute';
 const MainLayout = ({ children }) => <div className="min-h-screen">{children}</div>;
 const DashboardLayout = ({ children }) => <div className="min-h-screen">{children}</div>;
 
-// Placeholder components - Replace with actual components
-const HomePage = () => <div className="p-8"><h1 className="text-3xl font-bold">Welcome to SALON</h1></div>;
-const LoginPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Login</h1></div>;
-const RegisterPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Register</h1></div>;
-const ForgotPasswordPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Forgot Password</h1></div>;
-const ResetPasswordPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Reset Password</h1></div>;
+// Import actual page components
+import HomePage from './pages/Home';
+import LoginPage from './pages/auth/Login';
+import RegisterPage from './pages/auth/Register';
+import ForgotPasswordPage from './pages/auth/ForgotPassword';
+import ResetPasswordPage from './pages/auth/ResetPassword';
+import NotFoundPage from './pages/NotFound';
+import UnauthorizedPage from './pages/Unauthorized';
 
-const ServicesPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Services</h1></div>;
-const ServiceDetailPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Service Detail</h1></div>;
-const StylistsPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Stylists</h1></div>;
-const StylistDetailPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Stylist Detail</h1></div>;
+// Service pages
+import ServiceDetailPage from './pages/ServiceDetails';
+import StylistProfilePage from './pages/StylistProfile';
+
+// Client pages
+import ClientDashboard from './pages/client/Dashboard';
+import MyReservationsPage from './pages/client/Reservations';
+import BookingPage from './pages/client/BookAppointment';
+import MyProfilePage from './pages/client/Profile';
+import SearchServicesPage from './pages/client/SearchServices';
+
+// Stylist pages
+import StylistDashboard from './pages/stylist/Dashboard';
+import StylistSchedulePage from './pages/stylist/Schedule';
+import StylistPortfolioPage from './pages/stylist/Portfolio';
+import StylistEarningsPage from './pages/stylist/Earnings';
+
+// Admin pages
+import AdminDashboard from './pages/admin/Dashboard';
+import AdminUsersPage from './pages/admin/Users';
+import AdminServicesPage from './pages/admin/Services';
+import AdminReportsPage from './pages/admin/Reports';
+
+// Placeholder components for pages not yet created
 const GalleryPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Gallery</h1></div>;
 const AboutPage = () => <div className="p-8"><h1 className="text-3xl font-bold">About Us</h1></div>;
 const ContactPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Contact</h1></div>;
-
-// Client Dashboard
-const ClientDashboard = () => <div className="p-8"><h1 className="text-3xl font-bold">Client Dashboard</h1></div>;
-const MyReservationsPage = () => <div className="p-8"><h1 className="text-3xl font-bold">My Reservations</h1></div>;
-const BookingPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Book Service</h1></div>;
-const MyProfilePage = () => <div className="p-8"><h1 className="text-3xl font-bold">My Profile</h1></div>;
 const MessagesPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Messages</h1></div>;
 const PaymentHistoryPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Payment History</h1></div>;
-
-// Stylist Dashboard
-const StylistDashboard = () => <div className="p-8"><h1 className="text-3xl font-bold">Stylist Dashboard</h1></div>;
-const StylistSchedulePage = () => <div className="p-8"><h1 className="text-3xl font-bold">My Schedule</h1></div>;
 const StylistClientsPage = () => <div className="p-8"><h1 className="text-3xl font-bold">My Clients</h1></div>;
-const StylistPortfolioPage = () => <div className="p-8"><h1 className="text-3xl font-bold">My Portfolio</h1></div>;
-const StylistEarningsPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Earnings</h1></div>;
-const StylistProfilePage = () => <div className="p-8"><h1 className="text-3xl font-bold">Stylist Profile</h1></div>;
-
-// Admin Dashboard
-const AdminDashboard = () => <div className="p-8"><h1 className="text-3xl font-bold">Admin Dashboard</h1></div>;
-const AdminUsersPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Manage Users</h1></div>;
-const AdminServicesPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Manage Services</h1></div>;
 const AdminReservationsPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Manage Reservations</h1></div>;
-const AdminReportsPage = () => <div className="p-8"><h1 className="text-3xl font-bold">Reports</h1></div>;
-
-// Error Pages
-const NotFoundPage = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="text-center">
-      <h1 className="text-6xl font-bold text-neutral-900 dark:text-white">404</h1>
-      <p className="text-xl text-neutral-600 dark:text-neutral-400 mt-4">Page not found</p>
-      <a href="/" className="mt-6 inline-block px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-        Go Home
-      </a>
-    </div>
-  </div>
-);
-
-const UnauthorizedPage = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="text-center">
-      <h1 className="text-6xl font-bold text-neutral-900 dark:text-white">403</h1>
-      <p className="text-xl text-neutral-600 dark:text-neutral-400 mt-4">Unauthorized Access</p>
-      <p className="text-neutral-500 dark:text-neutral-500 mt-2">You don't have permission to access this page</p>
-      <a href="/" className="mt-6 inline-block px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-        Go Home
-      </a>
-    </div>
-  </div>
-);
 
 /**
  * React Router Configuration
@@ -86,20 +63,24 @@ const router = createBrowserRouter([
     element: <MainLayout><HomePage /></MainLayout>,
   },
   {
+    path: '/search',
+    element: <MainLayout><SearchServicesPage /></MainLayout>,
+  },
+  {
     path: '/services',
-    element: <MainLayout><ServicesPage /></MainLayout>,
+    element: <MainLayout><SearchServicesPage /></MainLayout>,
   },
   {
     path: '/services/:id',
     element: <MainLayout><ServiceDetailPage /></MainLayout>,
   },
   {
-    path: '/stylists',
-    element: <MainLayout><StylistsPage /></MainLayout>,
+    path: '/salon/:id',
+    element: <MainLayout><ServiceDetailPage /></MainLayout>,
   },
   {
     path: '/stylists/:id',
-    element: <MainLayout><StylistDetailPage /></MainLayout>,
+    element: <MainLayout><StylistProfilePage /></MainLayout>,
   },
   {
     path: '/gallery',
@@ -119,7 +100,15 @@ const router = createBrowserRouter([
     path: '/login',
     element: (
       <PublicOnlyRoute>
-        <LoginPage />
+        <MainLayout><LoginPage /></MainLayout>
+      </PublicOnlyRoute>
+    ),
+  },
+  {
+    path: '/auth/login',
+    element: (
+      <PublicOnlyRoute>
+        <MainLayout><LoginPage /></MainLayout>
       </PublicOnlyRoute>
     ),
   },
@@ -127,7 +116,15 @@ const router = createBrowserRouter([
     path: '/register',
     element: (
       <PublicOnlyRoute>
-        <RegisterPage />
+        <MainLayout><RegisterPage /></MainLayout>
+      </PublicOnlyRoute>
+    ),
+  },
+  {
+    path: '/auth/register',
+    element: (
+      <PublicOnlyRoute>
+        <MainLayout><RegisterPage /></MainLayout>
       </PublicOnlyRoute>
     ),
   },
@@ -135,7 +132,15 @@ const router = createBrowserRouter([
     path: '/forgot-password',
     element: (
       <PublicOnlyRoute>
-        <ForgotPasswordPage />
+        <MainLayout><ForgotPasswordPage /></MainLayout>
+      </PublicOnlyRoute>
+    ),
+  },
+  {
+    path: '/auth/forgot-password',
+    element: (
+      <PublicOnlyRoute>
+        <MainLayout><ForgotPasswordPage /></MainLayout>
       </PublicOnlyRoute>
     ),
   },
@@ -143,7 +148,15 @@ const router = createBrowserRouter([
     path: '/reset-password/:token',
     element: (
       <PublicOnlyRoute>
-        <ResetPasswordPage />
+        <MainLayout><ResetPasswordPage /></MainLayout>
+      </PublicOnlyRoute>
+    ),
+  },
+  {
+    path: '/auth/reset-password/:token',
+    element: (
+      <PublicOnlyRoute>
+        <MainLayout><ResetPasswordPage /></MainLayout>
       </PublicOnlyRoute>
     ),
   },
