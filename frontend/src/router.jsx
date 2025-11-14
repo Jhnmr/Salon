@@ -23,6 +23,7 @@ import UnauthorizedPage from './pages/Unauthorized';
 // Service pages
 import ServiceDetailPage from './pages/ServiceDetails';
 import StylistProfilePage from './pages/StylistProfile';
+import BranchDetailPage from './pages/BranchDetail';
 
 // Client pages
 import ClientDashboard from './pages/client/Dashboard';
@@ -76,7 +77,11 @@ const router = createBrowserRouter([
   },
   {
     path: '/salon/:id',
-    element: <MainLayout><ServiceDetailPage /></MainLayout>,
+    element: <MainLayout><BranchDetailPage /></MainLayout>,
+  },
+  {
+    path: '/branches/:id',
+    element: <MainLayout><BranchDetailPage /></MainLayout>,
   },
   {
     path: '/stylists/:id',

@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import { useReservations } from '../../contexts/ReservationContext';
 import { Card, Button, Input, Badge, Loader } from '../../components/ui';
+import StripePayment from '../../components/StripePayment';
 import * as servicesService from '../../services/services.service';
 import * as stylistsService from '../../services/stylists.service';
 import { formatCurrency, formatDate } from '../../utils/formatters';
@@ -383,16 +384,47 @@ const BookAppointment = () => {
         return (
           <div>
             <h2 className="text-2xl font-bold text-white mb-6">Payment</h2>
-            <Card className="bg-blue-500/10 border-blue-500/50 text-center py-12">
-              <svg className="w-16 h-16 mx-auto mb-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-              </svg>
-              <h3 className="text-xl font-semibold text-white mb-2">Stripe Payment Integration</h3>
-              <p className="text-gray-400 mb-6">Payment processing will be integrated here</p>
-              <Button variant="primary" onClick={handleCompleteBooking} isLoading={isLoading}>
-                Complete Booking (Skip Payment)
-              </Button>
+
+            {/* Booking Summary */}
+            <Card className="mb-6">
+              <h3 className="text-white font-semibold mb-4">Booking Summary</h3>
+              <div className="space-y-3 mb-4">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Services:</span>
+                  <span className="text-white">{selectedServices.map(s => s.name).join(', ')}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Stylist:</span>
+                  <span className="text-white">{selectedStylist?.name}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Date & Time:</span>
+                  <span className="text-white">{selectedDate} at {selectedTime}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Duration:</span>
+                  <span className="text-white">{getTotalDuration()} minutes</span>
+                </div>
+                <div className="border-t border-gray-600 pt-3 flex justify-between font-semibold">
+                  <span className="text-white text-lg">Total:</span>
+                  <span className="text-yellow-400 text-2xl">{formatCurrency(getTotalPrice())}</span>
+                </div>
+              </div>
             </Card>
+
+            {/* Stripe Payment Component */}
+            <StripePayment
+              amount={getTotalPrice() * 100} // Convert to cents
+              currency="USD"
+              onSuccess={(paymentMethod) => {
+                console.log('Payment successful:', paymentMethod);
+                handleCompleteBooking();
+              }}
+              onError={(error) => {
+                console.error('Payment failed:', error);
+                setError(error.message || 'Payment failed');
+              }}
+            />
           </div>
         );
 
