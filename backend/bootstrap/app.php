@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // Authentication & Authorization
             'jwt' => \App\Http\Middleware\JwtMiddleware::class,
             'rbac' => \App\Http\Middleware\RBACMiddleware::class,
+            'role' => \App\Http\Middleware\RoleMiddleware::class, // Simple role-based access
 
             // Security Middleware
             'security.headers' => \App\Http\Middleware\SecurityHeadersMiddleware::class,

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('user_id')->unique()->comment('FK a users');
+            $table->unsignedBigInteger('user_id')->unique()->comment('FK a users'); // Fixed: changed from unsignedInteger
 
             // Ubicación
             $table->decimal('location_lat', 10, 8)->nullable();

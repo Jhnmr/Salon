@@ -207,6 +207,48 @@ class AuditLog extends Model
     }
 
     /**
+     * Log a password reset request
+     *
+     * @param int $userId
+     * @param string|null $ipAddress
+     * @return self
+     */
+    public static function logPasswordResetRequest(int $userId, ?string $ipAddress = null): self
+    {
+        return self::create([
+            'user_id' => $userId,
+            'action' => 'password_reset_requested',
+            'table_name' => 'users',
+            'record_id' => $userId,
+            'old_data' => null,
+            'new_data' => null,
+            'ip_address' => $ipAddress ?? request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+    }
+
+    /**
+     * Log a completed password reset
+     *
+     * @param int $userId
+     * @param string|null $ipAddress
+     * @return self
+     */
+    public static function logPasswordResetCompleted(int $userId, ?string $ipAddress = null): self
+    {
+        return self::create([
+            'user_id' => $userId,
+            'action' => 'password_reset_completed',
+            'table_name' => 'users',
+            'record_id' => $userId,
+            'old_data' => null,
+            'new_data' => null,
+            'ip_address' => $ipAddress ?? request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+    }
+
+    /**
      * Get changes between old and new data
      *
      * @return array

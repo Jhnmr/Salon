@@ -9,19 +9,57 @@ class Reservation extends Model
 {
     use HasFactory;
 
+    protected $table = 'reservations';
+
     protected $fillable = [
         'client_id',
         'stylist_id',
         'service_id',
+        'branch_id',
         'scheduled_at',
+        'duration_minutes',
+        'total_duration',
         'status',
-        'notes',
+        'reminder_sent',
+        'confirmed_at',
+        'completed_at',
+        'cancelled_by',
+        'service_price',
+        'discount_price',
+        'discount_amount',
+        'tip',
         'total_price',
+        'notes',
+        'internal_notes',
+        'special_allergies',
+        'requires_confirmation',
+        'confirmed_by',
+        'cancellable_until',
+        'cancellation_penalty',
+        'reminder_24h_sent',
+        'reminder_1h_sent',
+        'origin',
+        'device',
+        'browser',
+        'creation_ip',
+        'appointment_code',
     ];
 
     protected $casts = [
         'scheduled_at' => 'datetime',
+        'confirmed_at' => 'datetime',
+        'completed_at' => 'datetime',
+        'cancellable_until' => 'datetime',
         'total_price' => 'decimal:2',
+        'service_price' => 'decimal:2',
+        'discount_price' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'tip' => 'decimal:2',
+        'cancellation_penalty' => 'decimal:2',
+        'reminder_sent' => 'boolean',
+        'requires_confirmation' => 'boolean',
+        'reminder_24h_sent' => 'boolean',
+        'reminder_1h_sent' => 'boolean',
     ];
 
     /**
@@ -49,10 +87,77 @@ class Reservation extends Model
     }
 
     /**
+     * Get the branch where reservation is scheduled
+     */
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    /**
      * Get the notifications for this reservation
      */
     public function notifications()
     {
         return $this->hasMany(Notification::class);
+    }
+
+    /**
+     * Get the payment for this reservation
+     */
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
+
+    /**
+     * Get the review for this reservation
+     */
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
+
+    /**
+     * Check if reservation can be cancelled
+     */
+    public function isCancellable(): bool
+    {
+        if ($this->status === 'cancelled' || $this->status === 'completed') {
+            return false;
+        }
+
+        if ($this->cancellable_until && now()->isAfter($this->cancellable_until)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if reservation is upcoming
+     */
+    public function isUpcoming(): bool
+    {
+        return $this->scheduled_at && $this->scheduled_at->isFuture() &&
+               in_array($this->status, ['pending', 'confirmed']);
+    }
+
+    /**
+     * Scope for upcoming reservations
+     */
+    public function scopeUpcoming($query)
+    {
+        return $query->where('scheduled_at', '>', now())
+                    ->whereIn('status', ['pending', 'confirmed']);
+    }
+
+    /**
+     * Scope for past reservations
+     */
+    public function scopePast($query)
+    {
+        return $query->where('scheduled_at', '<', now())
+                    ->orWhereIn('status', ['completed', 'cancelled', 'no_show']);
     }
 }
