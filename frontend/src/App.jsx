@@ -28,6 +28,10 @@ import { SearchStylists } from './pages/SearchStylists';
 import { StylistProfile } from './pages/StylistProfile';
 import { Favorites } from './pages/Favorites';
 import { About } from './pages/About';
+import { ContactUs } from './pages/ContactUs';
+import { AccountSettings } from './pages/AccountSettings';
+import { TermsOfService } from './pages/TermsOfService';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
 
 function App() {
   return (
@@ -42,6 +46,9 @@ function App() {
         <Route path="/stylist/:stylistId/profile" element={<StylistProfile />} />
         <Route path="/stylist/:stylistId/ratings" element={<StylistRatings />} />
         <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
 
         {/* Protected Routes */}
         <Route
@@ -105,6 +112,14 @@ function App() {
           element={
             <PrivateRoute>
               <Notifications />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <PrivateRoute>
+              <AccountSettings />
             </PrivateRoute>
           }
         />

@@ -17,6 +17,7 @@ export const Navbar = () => {
     if (!isAuthenticated || !user) {
       return [
         { label: 'Acerca de', path: '/about' },
+        { label: 'Contacto', path: '/contact' },
         { label: 'Iniciar Sesión', path: '/login' },
         { label: 'Registrarse', path: '/register' },
       ];
@@ -26,6 +27,7 @@ export const Navbar = () => {
       { label: 'Dashboard', path: '/dashboard' },
       { label: 'Mi Perfil', path: '/profile' },
       { label: 'Notificaciones', path: '/notifications' },
+      { label: 'Configuración', path: '/settings' },
     ];
 
     if (user.role === 'client') {
