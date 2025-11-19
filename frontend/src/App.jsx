@@ -15,6 +15,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Services } from './pages/Services';
 import { Reservations } from './pages/Reservations';
 import { Profile } from './pages/Profile';
+import { Notifications } from './pages/Notifications';
 
 function App() {
   return (
@@ -60,6 +61,14 @@ function App() {
               <ClientRoute>
                 <Reservations />
               </ClientRoute>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <PrivateRoute>
+              <Notifications />
             </PrivateRoute>
           }
         />

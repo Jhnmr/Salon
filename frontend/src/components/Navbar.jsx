@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { NotificationBell } from './NotificationBell';
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -83,6 +84,7 @@ export const Navbar = () => {
           <div className="hidden md:flex md:items-center md:space-x-4">
             {isAuthenticated && user && (
               <>
+                <NotificationBell />
                 <span className="text-sm text-gray-600">
                   {user.name}
                 </span>
