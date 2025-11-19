@@ -16,6 +16,10 @@ import { Services } from './pages/Services';
 import { Reservations } from './pages/Reservations';
 import { Profile } from './pages/Profile';
 import { Notifications } from './pages/Notifications';
+import { Users } from './pages/Users';
+import { AdminServices } from './pages/AdminServices';
+import { MyAppointments } from './pages/MyAppointments';
+import { Availability } from './pages/Availability';
 
 function App() {
   return (
@@ -69,6 +73,50 @@ function App() {
           element={
             <PrivateRoute>
               <Notifications />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Admin Routes */}
+        <Route
+          path="/users"
+          element={
+            <PrivateRoute>
+              <AdminRoute>
+                <Users />
+              </AdminRoute>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/services"
+          element={
+            <PrivateRoute>
+              <AdminRoute>
+                <AdminServices />
+              </AdminRoute>
+            </PrivateRoute>
+          }
+        />
+
+        {/* Stylist Routes */}
+        <Route
+          path="/my-appointments"
+          element={
+            <PrivateRoute>
+              <StylistRoute>
+                <MyAppointments />
+              </StylistRoute>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/availability"
+          element={
+            <PrivateRoute>
+              <StylistRoute>
+                <Availability />
+              </StylistRoute>
             </PrivateRoute>
           }
         />
