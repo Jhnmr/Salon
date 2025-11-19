@@ -24,6 +24,8 @@ import { BookService } from './pages/BookService';
 import { AdminReservations } from './pages/AdminReservations';
 import { StylistRatings } from './pages/StylistRatings';
 import { StylistStats } from './pages/StylistStats';
+import { SearchStylists } from './pages/SearchStylists';
+import { StylistProfile } from './pages/StylistProfile';
 
 function App() {
   return (
@@ -34,6 +36,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/search-stylists" element={<SearchStylists />} />
+        <Route path="/stylist/:stylistId/profile" element={<StylistProfile />} />
         <Route path="/stylist/:stylistId/ratings" element={<StylistRatings />} />
 
         {/* Protected Routes */}

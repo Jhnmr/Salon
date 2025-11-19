@@ -24,11 +24,13 @@ export const Navbar = () => {
     const commonLinks = [
       { label: 'Dashboard', path: '/dashboard' },
       { label: 'Mi Perfil', path: '/profile' },
+      { label: 'Notificaciones', path: '/notifications' },
     ];
 
     if (user.role === 'client') {
       return [
         ...commonLinks,
+        { label: 'Buscar Estilistas', path: '/search-stylists' },
         { label: 'Servicios', path: '/services' },
         { label: 'Mis Reservas', path: '/reservations' },
       ];
@@ -38,6 +40,7 @@ export const Navbar = () => {
       return [
         ...commonLinks,
         { label: 'Mis Citas', path: '/my-appointments' },
+        { label: 'Mi Desempeño', path: '/my-stats' },
         { label: 'Horarios', path: '/availability' },
       ];
     }
