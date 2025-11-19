@@ -20,6 +20,8 @@ import { Users } from './pages/Users';
 import { AdminServices } from './pages/AdminServices';
 import { MyAppointments } from './pages/MyAppointments';
 import { Availability } from './pages/Availability';
+import { BookService } from './pages/BookService';
+import { AdminReservations } from './pages/AdminReservations';
 
 function App() {
   return (
@@ -54,6 +56,16 @@ function App() {
             <PrivateRoute>
               <ClientRoute>
                 <Services />
+              </ClientRoute>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/book-service/:serviceId"
+          element={
+            <PrivateRoute>
+              <ClientRoute>
+                <BookService />
               </ClientRoute>
             </PrivateRoute>
           }
@@ -94,6 +106,16 @@ function App() {
             <PrivateRoute>
               <AdminRoute>
                 <AdminServices />
+              </AdminRoute>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/reservations"
+          element={
+            <PrivateRoute>
+              <AdminRoute>
+                <AdminReservations />
               </AdminRoute>
             </PrivateRoute>
           }
