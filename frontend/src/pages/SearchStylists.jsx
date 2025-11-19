@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { profileService, ratingService } from '../services/api';
+import { profileService, ratingService, favoriteService } from '../services/api';
+import { useAuth } from '../hooks/useAuth';
 
 export const SearchStylists = () => {
+  const { isAuthenticated } = useAuth();
   const [stylists, setStylists] = useState([]);
   const [filteredStylists, setFilteredStylists] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,10 +16,14 @@ export const SearchStylists = () => {
   const [sortBy, setSortBy] = useState('rating');
 
   const [stylistRatings, setStylistRatings] = useState({});
+  const [favorites, setFavorites] = useState(new Set());
 
   useEffect(() => {
     fetchStylists();
-  }, []);
+    if (isAuthenticated) {
+      fetchFavorites();
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     applyFilters();
@@ -54,6 +60,34 @@ export const SearchStylists = () => {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchFavorites = async () => {
+    try {
+      const res = await favoriteService.getMyFavorites();
+      const favoriteIds = new Set(
+        (res.data.favorites || []).map((f) => f.stylist_id)
+      );
+      setFavorites(favoriteIds);
+    } catch (err) {
+      console.error('Error loading favorites:', err);
+    }
+  };
+
+  const handleToggleFavorite = async (stylistId) => {
+    try {
+      const isFavorited = favorites.has(stylistId);
+      if (isFavorited) {
+        await favoriteService.removeFavorite(stylistId);
+        setFavorites(new Set([...favorites].filter((id) => id !== stylistId)));
+      } else {
+        await favoriteService.addFavorite(stylistId);
+        setFavorites(new Set([...favorites, stylistId]));
+      }
+    } catch (err) {
+      alert('Error al actualizar favorito');
+      console.error(err);
     }
   };
 
@@ -304,6 +338,23 @@ export const SearchStylists = () => {
                       >
                         Reseñas
                       </Link>
+                      {isAuthenticated && (
+                        <button
+                          onClick={() => handleToggleFavorite(stylist.user_id)}
+                          className={`px-3 py-2 rounded-lg transition font-semibold text-sm ${
+                            favorites.has(stylist.user_id)
+                              ? 'bg-red-600 text-white hover:bg-red-700'
+                              : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
+                          }`}
+                          title={
+                            favorites.has(stylist.user_id)
+                              ? 'Quitar de favoritos'
+                              : 'Agregar a favoritos'
+                          }
+                        >
+                          {favorites.has(stylist.user_id) ? '❤️' : '🤍'}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

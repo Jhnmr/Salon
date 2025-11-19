@@ -16,6 +16,7 @@ export const Navbar = () => {
   const getNavLinks = () => {
     if (!isAuthenticated || !user) {
       return [
+        { label: 'Acerca de', path: '/about' },
         { label: 'Iniciar Sesión', path: '/login' },
         { label: 'Registrarse', path: '/register' },
       ];
@@ -31,6 +32,7 @@ export const Navbar = () => {
       return [
         ...commonLinks,
         { label: 'Buscar Estilistas', path: '/search-stylists' },
+        { label: 'Favoritos', path: '/favorites' },
         { label: 'Servicios', path: '/services' },
         { label: 'Mis Reservas', path: '/reservations' },
       ];

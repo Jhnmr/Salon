@@ -125,4 +125,12 @@ export const ratingService = {
   getStylistStats: (stylistId) => api.get(`/ratings/stats/${stylistId}`),
 };
 
+// Funciones de favoritos
+export const favoriteService = {
+  getMyFavorites: () => api.get('/favorites'),
+  addFavorite: (stylistId) => api.post('/favorites', { stylist_id: stylistId }),
+  removeFavorite: (stylistId) => api.delete(`/favorites/${stylistId}`),
+  isFavorite: (stylistId) => api.get(`/favorites/${stylistId}/check`),
+};
+
 export default api;

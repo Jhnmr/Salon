@@ -26,6 +26,8 @@ import { StylistRatings } from './pages/StylistRatings';
 import { StylistStats } from './pages/StylistStats';
 import { SearchStylists } from './pages/SearchStylists';
 import { StylistProfile } from './pages/StylistProfile';
+import { Favorites } from './pages/Favorites';
+import { About } from './pages/About';
 
 function App() {
   return (
@@ -39,6 +41,7 @@ function App() {
         <Route path="/search-stylists" element={<SearchStylists />} />
         <Route path="/stylist/:stylistId/profile" element={<StylistProfile />} />
         <Route path="/stylist/:stylistId/ratings" element={<StylistRatings />} />
+        <Route path="/about" element={<About />} />
 
         {/* Protected Routes */}
         <Route
@@ -63,6 +66,16 @@ function App() {
             <PrivateRoute>
               <ClientRoute>
                 <Services />
+              </ClientRoute>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/favorites"
+          element={
+            <PrivateRoute>
+              <ClientRoute>
+                <Favorites />
               </ClientRoute>
             </PrivateRoute>
           }
