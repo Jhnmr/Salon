@@ -22,6 +22,8 @@ import { MyAppointments } from './pages/MyAppointments';
 import { Availability } from './pages/Availability';
 import { BookService } from './pages/BookService';
 import { AdminReservations } from './pages/AdminReservations';
+import { StylistRatings } from './pages/StylistRatings';
+import { StylistStats } from './pages/StylistStats';
 
 function App() {
   return (
@@ -32,6 +34,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/stylist/:stylistId/ratings" element={<StylistRatings />} />
 
         {/* Protected Routes */}
         <Route
@@ -138,6 +141,16 @@ function App() {
             <PrivateRoute>
               <StylistRoute>
                 <Availability />
+              </StylistRoute>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/my-stats"
+          element={
+            <PrivateRoute>
+              <StylistRoute>
+                <StylistStats />
               </StylistRoute>
             </PrivateRoute>
           }

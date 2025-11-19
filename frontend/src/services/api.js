@@ -115,4 +115,14 @@ export const dashboardService = {
   getQuickStats: () => api.get('/dashboard/stats'),
 };
 
+// Funciones de ratings y reseñas
+export const ratingService = {
+  getStylistRatings: (stylistId) => api.get(`/ratings/stylist/${stylistId}`),
+  getMyRatings: () => api.get('/ratings/mine'),
+  createRating: (data) => api.post('/ratings', data),
+  updateRating: (id, data) => api.put(`/ratings/${id}`, data),
+  deleteRating: (id) => api.delete(`/ratings/${id}`),
+  getStylistStats: (stylistId) => api.get(`/ratings/stats/${stylistId}`),
+};
+
 export default api;
