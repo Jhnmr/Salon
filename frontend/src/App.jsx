@@ -12,6 +12,9 @@ import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
+import { Services } from './pages/Services';
+import { Reservations } from './pages/Reservations';
+import { Profile } from './pages/Profile';
 
 function App() {
   return (
@@ -29,6 +32,34 @@ function App() {
           element={
             <PrivateRoute>
               <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/services"
+          element={
+            <PrivateRoute>
+              <ClientRoute>
+                <Services />
+              </ClientRoute>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/reservations"
+          element={
+            <PrivateRoute>
+              <ClientRoute>
+                <Reservations />
+              </ClientRoute>
             </PrivateRoute>
           }
         />
